@@ -89,7 +89,7 @@ class Tx_L10nmgr_Controller_Cm3_Index extends \TYPO3\CMS\Backend\Module\BaseScri
         // Draw the header.
         $this->doc = GeneralUtility::makeInstance(DocumentTemplate::class);
         $this->doc->backPath = $BACK_PATH;
-        $this->doc->form = '<form action="" method="post" enctype="' . $TYPO3_CONF_VARS['SYS']['form_enctype'] . '">';
+        $this->doc->form = '<form action="" method="post" enctype="multipart/form-data">';
 
         // JavaScript
         $this->doc->JScode = '

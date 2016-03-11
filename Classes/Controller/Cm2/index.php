@@ -89,7 +89,7 @@ class Cm2 extends \TYPO3\CMS\Backend\Module\BaseScriptClass
         // Draw the header.
         $this->doc = GeneralUtility::makeInstance(DocumentTemplate::class);
         $this->doc->backPath = $BACK_PATH;
-        $this->doc->form = '<form action="" method="post" enctype="' . $TYPO3_CONF_VARS['SYS']['form_enctype'] . '">';
+        $this->doc->form = '<form action="" method="post" enctype="multipart/form-data">';
 
         // JavaScript
         $this->doc->JScode = '

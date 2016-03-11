@@ -174,7 +174,7 @@ class Cm1 extends BaseScriptClass
         $this->doc = GeneralUtility::makeInstance(DocumentTemplate::class);
         $this->doc->backPath = $GLOBALS['BACK_PATH'];
         $this->doc->setModuleTemplate('EXT:l10nmgr/Resources/Private/Templates/Cm1Template.html');
-        $this->doc->form = '<form action="" method="post" enctype="' . $GLOBALS['TYPO3_CONF_VARS']['SYS']['form_enctype'] . '">';
+        $this->doc->form = '<form action="" method="post" enctype="multipart/form-data">';
 
         // JavaScript
         $this->doc->JScode = '
