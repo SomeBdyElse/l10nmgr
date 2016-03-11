@@ -26,10 +26,5 @@
 $GLOBALS['SOBE'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\Localizationteam\L10nmgr\Controller\Module1::class);
 $GLOBALS['SOBE']->init();
 
-// Include files?
-foreach ($GLOBALS['SOBE']->include_once as $INC_FILE) {
-    include_once($INC_FILE);
-}
-
 $GLOBALS['SOBE']->main();
 $GLOBALS['SOBE']->printContent();

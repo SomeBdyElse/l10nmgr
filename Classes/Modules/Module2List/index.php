@@ -250,11 +250,6 @@ class Module2List extends BaseScriptClass
 $SOBE = GeneralUtility::makeInstance(Module2List::class);
 $SOBE->init();
 
-// Include files?
-foreach ($SOBE->include_once as $INC_FILE) {
-    include_once($INC_FILE);
-}
-
 $SOBE->main();
 $SOBE->printContent();
 
