@@ -88,8 +88,6 @@ class CatXmlView extends AbstractExportView
      */
     function render()
     {
-        global $LANG, $BE_USER;
-
         $this->domDocument = new DOMDocument();
 
         $sysLang = $this->sysLang;
