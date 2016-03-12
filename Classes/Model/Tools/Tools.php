@@ -56,7 +56,12 @@ class Tools
 
     // Internal:
     var $includeFceWithDefaultLanguage = false; // Object to t3lib_transl8tools, set in constructor
+
+    /**
+     * @var TranslationConfigurationProvider
+     */
     var $t8Tools = null; // Output for translation details
+
     var $detailsOutput = array(); // System languages initialized
     var $sysLanguages = array(); // FlexForm diff data
     var $flexFormDiff = array(); // System languages records, loaded by constructor

@@ -154,6 +154,7 @@ class L10nAccumulatedInformation
             $l10ncfg['tableUidConstraint'], 1));
 
         // Init:
+        /** @var Tools $t8Tools */
         $t8Tools = GeneralUtility::makeInstance(Tools::class);
         $t8Tools->verbose = false; // Otherwise it will show records which has fields but none editable.
         if ($l10ncfg['incfcewithdefaultlanguage'] == 1) {
