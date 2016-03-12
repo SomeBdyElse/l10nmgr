@@ -24,14 +24,10 @@ class InlineRelationTool
 
     public function addNestingInformation(&$accum)
     {
-        /** @var InlineRelationTool $inlineRelationsTool */
-        $inlineRelationsTool = GeneralUtility::makeInstance(InlineRelationTool::class, $this->l10ncfg);
-
         $flattened = $this->flattenAccumulatedRecords($accum);
 
-        $inlineRelations = $inlineRelationsTool->getInlineRelations();
         /** @var InlineRelation $inlineRelation */
-        foreach($inlineRelations as $inlineRelation) {
+        foreach($this->inlineRelations as $inlineRelation) {
             $parentTCAConf = $inlineRelation->parentTCAConf;
             $parentTable = $inlineRelation->parentTable;
             $parentField = $inlineRelation->parentField;
