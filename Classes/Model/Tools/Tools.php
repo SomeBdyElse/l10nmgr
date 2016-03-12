@@ -23,37 +23,7 @@ namespace Localizationteam\L10nmgr\Model\Tools;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-/**
- * Contains translation tools
- *
- * $Id: class.t3lib_loaddbgroup.php 1816 2006-11-26 00:43:24Z mundaun $
- *
- * @author  Kasper Skaarhoj <kasperYYYY@typo3.com>
- */
-/**
- * [CLASS/FUNCTION INDEX of SCRIPT]
- *
- *
- *
- *   69: class tx_l10nmgr_tools
- *   95:   function tx_l10nmgr_tools()
- *  113:   function getRecordsToTranslateFromTable($table,$pageId)
- *  140:   function getSingleRecordToTranslate($table,$uid)
- *  169:   function translationDetails($table,$row,$sysLang,$flexFormDiff=array())
- *  282:   function translationDetails_flexFormCallBack($dsArr, $dataValue, $PA, $structurePath, $pObj)
- *  329:   function translationDetails_addField($key, $TCEformsCfg, $dataValue, $translationValue, $diffDefaultValue='', $previewLanguageValues=array())
- *  372:   function indexDetailsRecord($table,$uid)
- *  393:   function indexDetailsPage($pageId)
- *  429:   function diffCMP($old, $new)
- *  444:   function compileIndexRecord($table,$fullDetails,$sys_lang,$pid)
- *  501:   function updateIndexTable($record)
- *  513:   function updateIndexTableFromDetailsArray($rDetails,$echo=FALSE)
- *  528:   function flushIndexOfWorkspace($ws)
- *
- * TOTAL FUNCTIONS: 13
- * (This index is automatically created/updated by the extension "extdeveval")
- *
- */
+
 use TYPO3\CMS\Backend\Configuration\TranslationConfigurationProvider;
 use TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
