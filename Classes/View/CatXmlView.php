@@ -43,6 +43,7 @@ use Localizationteam\L10nmgr\Model\Tools\Utf8Tools;
  */
 class CatXmlView extends AbstractExportView
 {
+    protected $xmlTool;
 
     /**
      * @var  integer $forcedSourceLanguage Overwrite the default language uid with the desired language to export
@@ -51,8 +52,15 @@ class CatXmlView extends AbstractExportView
 
     var $exportType = '1';
 
+    /**
+     * @var string
+     */
+    protected $targetIso;
+
+
     function __construct($l10ncfgObj, $sysLang)
     {
+        $this->xmlTool = GeneralUtility::makeInstance(XmlTools::class);
         parent::__construct($l10ncfgObj, $sysLang);
     }
 
@@ -72,100 +80,20 @@ class CatXmlView extends AbstractExportView
             $accumObj->setForcedPreviewLanguage($this->forcedSourceLanguage);
         }
         $accum = $accumObj->getInfoArray();
-        $errorMessage = array();
-        /** @var $xmlTool XmlTools */
-        $xmlTool = GeneralUtility::makeInstance(XmlTools::class);
-        $output = array();
+
+        $output = [];
 
         // Traverse the structure and generate XML output:
         foreach ($accum as $pId => $page) {
             $output[] = "\t" . '<pageGrp id="' . $pId . '" sourceUrl="' . GeneralUtility::getIndpEnv("TYPO3_SITE_URL") . 'index.php?id=' . $pId . '">' . "\n";
             foreach ($accum[$pId]['items'] as $table => $elements) {
                 foreach ($elements as $elementUid => $data) {
-                    if (!empty($data['ISOcode'])) {
-                        $targetIso = $data['ISOcode'];
-                    }
-
-                    if (is_array($data['fields'])) {
-                        $fieldsForRecord = array();
-                        foreach ($data['fields'] as $key => $tData) {
-                            if (is_array($tData)) {
-                                list(, $uidString, $fieldName) = explode(':', $key);
-                                list($uidValue) = explode('/', $uidString);
-
-                                $noChangeFlag = !strcmp(trim($tData['diffDefaultValue']), trim($tData['defaultValue']));
-
-                                if (!$this->modeOnlyChanged || !$noChangeFlag) {
-
-                                    // @DP: Why this check?
-                                    if (($this->forcedSourceLanguage && isset($tData['previewLanguageValues'][$this->forcedSourceLanguage])) || $this->forcedSourceLanguage === false) {
-
-                                        if ($this->forcedSourceLanguage) {
-                                            $dataForTranslation = $tData['previewLanguageValues'][$this->forcedSourceLanguage];
-                                        } else {
-                                            $dataForTranslation = $tData['defaultValue'];
-                                        }
-                                        $_isTranformedXML = false;
-                                        // Following checks are not enough! Fields that could be transformed to be XML conform are not transformed! textpic fields are not isRTE=1!!! No idea why...
-                                        //DZ 2010-09-08
-                                        // > if > else loop instead of ||
-                                        // Test re-import of XML! RTE-Back transformation
-                                        //echo $tData['fieldType'];
-                                        //if (preg_match('/templavoila_flex/',$key)) { echo "1 -"; }
-                                        //echo $key."\n";
-
-                                        if ($tData['fieldType'] == 'text' && $tData['isRTE'] || (preg_match('/templavoila_flex/',
-                                                $key))
-                                        ) {
-                                            $dataForTranslationTranformed = $xmlTool->RTE2XML($dataForTranslation);
-                                            if ($dataForTranslationTranformed !== false) {
-                                                $_isTranformedXML = true;
-                                                $dataForTranslation = $dataForTranslationTranformed;
-                                            }
-                                        }
-                                        if ($_isTranformedXML) {
-                                            $output[] = "\t\t" . '<data table="' . $table . '" elementUid="' . $elementUid . '" key="' . $key . '" transformations="1">' . $dataForTranslation . '</data>' . "\n";
-                                        } else {
-                                            // Substitute HTML entities with actual characters (we use UTF-8 anyway:-) but leave quotes untouched
-                                            $dataForTranslation = html_entity_decode($dataForTranslation, ENT_NOQUOTES,
-                                                'UTF-8');
-                                            //Substitute & with &amp; in non-RTE fields
-                                            $dataForTranslation = preg_replace('/&(?!(amp|nbsp|quot|apos|lt|gt);)/',
-                                                '&amp;', $dataForTranslation);
-                                            //Substitute > and < in non-RTE fields
-                                            $dataForTranslation = str_replace(' < ', ' &lt; ', $dataForTranslation);
-                                            $dataForTranslation = str_replace(' > ', ' &gt; ', $dataForTranslation);
-                                            $dataForTranslation = str_replace('<br>', '<br/>', $dataForTranslation);
-                                            $dataForTranslation = str_replace('<hr>', '<hr/>', $dataForTranslation);
-                                            //$dataForTranslation = \TYPO3\CMS\Core\Utility\GeneralUtility::deHSCentities($dataForTranslation);
-
-                                            $params = $BE_USER->getModuleData('l10nmgr/cm1/prefs', 'prefs');
-                                            if ($params['utf8'] == '1') {
-                                                $dataForTranslation = Utf8Tools::utf8_bad_strip($dataForTranslation);
-                                            }
-                                            if ($xmlTool->isValidXMLString($dataForTranslation)) {
-                                                $output[] = "\t\t" . '<data table="' . $table . '" elementUid="' . $elementUid . '" key="' . $key . '">' . $dataForTranslation . '</data>' . "\n";
-                                            } else {
-                                                if ($params['noxmlcheck'] == '1') {
-                                                    $output[] = "\t\t" . '<data table="' . $table . '" elementUid="' . $elementUid . '" key="' . $key . '"><![CDATA[' . $dataForTranslation . ']]></data>' . "\n";
-                                                } else {
-                                                    $this->setInternalMessage($LANG->getLL('export.process.error.invalid.message'),
-                                                        $elementUid . '/' . $table . '/' . $key);
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        $this->setInternalMessage($LANG->getLL('export.process.error.empty.message'),
-                                            $elementUid . '/' . $table . '/' . $key);
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    $output[] = $this->getXmlForRecord($table, $elementUid, $data);
                 }
             }
             $output[] = "\t" . '</pageGrp>' . "\r";
         }
+
         // Provide a hook for specific manipulations before building the actual XML
         if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['exportCatXmlPreProcess'])) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['exportCatXmlPreProcess'] as $classReference) {
@@ -188,7 +116,7 @@ class CatXmlView extends AbstractExportView
         $XML .= "\t\t" . '<t3_l10ncfg>' . $this->l10ncfgObj->getData('uid') . '</t3_l10ncfg>' . "\n";
         $XML .= "\t\t" . '<t3_sysLang>' . $sysLang . '</t3_sysLang>' . "\n";
         $XML .= "\t\t" . '<t3_sourceLang>' . $staticLangArr['lg_iso_2'] . '</t3_sourceLang>' . "\n";
-        $XML .= "\t\t" . '<t3_targetLang>' . $targetIso . '</t3_targetLang>' . "\n";
+        $XML .= "\t\t" . '<t3_targetLang>' . $this->targetIso . '</t3_targetLang>' . "\n";
         $XML .= "\t\t" . '<t3_baseURL>' . GeneralUtility::getIndpEnv("TYPO3_SITE_URL") . '</t3_baseURL>' . "\n";
         $XML .= "\t\t" . '<t3_workspaceId>' . $GLOBALS['BE_USER']->workspace . '</t3_workspaceId>' . "\n";
         $XML .= "\t\t" . '<t3_count>' . $accumObj->getFieldCount() . '</t3_count>' . "\n";
@@ -231,5 +159,112 @@ class CatXmlView extends AbstractExportView
     function setForcedSourceLanguage($id)
     {
         $this->forcedSourceLanguage = $id;
+    }
+
+    /**
+     * @param $table
+     * @param $elementUid
+     * @param $data
+     * @return array
+     */
+    protected function getXmlForRecord($table, $elementUid, $data)
+    {
+        if (!empty($data['ISOcode'])) {
+            $this->targetIso = $data['ISOcode'];
+        }
+
+        $output = [];
+
+        if (is_array($data['fields'])) {
+            foreach ($data['fields'] as $key => $tData) {
+                $output[] = $this->xmlForField($table, $elementUid, $key, $tData);
+            }
+        }
+
+        return implode('', $output);
+    }
+
+    /**
+     * @param $table
+     * @param $elementUid
+     * @param $tData
+     * @param $key
+     * @return string
+     */
+    protected function xmlForField($table, $elementUid, $key, $tData)
+    {
+        if (is_array($tData)) {
+            list(, $uidString, $fieldName) = explode(':', $key);
+            list($uidValue) = explode('/', $uidString);
+
+            $noChangeFlag = !strcmp(trim($tData['diffDefaultValue']), trim($tData['defaultValue']));
+
+            if (!$this->modeOnlyChanged || !$noChangeFlag) {
+
+                // @DP: Why this check?
+                if (($this->forcedSourceLanguage && isset($tData['previewLanguageValues'][$this->forcedSourceLanguage])) || $this->forcedSourceLanguage === false) {
+
+                    if ($this->forcedSourceLanguage) {
+                        $dataForTranslation = $tData['previewLanguageValues'][$this->forcedSourceLanguage];
+                    } else {
+                        $dataForTranslation = $tData['defaultValue'];
+                    }
+                    $_isTranformedXML = false;
+                    // Following checks are not enough! Fields that could be transformed to be XML conform are not transformed! textpic fields are not isRTE=1!!! No idea why...
+                    //DZ 2010-09-08
+                    // > if > else loop instead of ||
+                    // Test re-import of XML! RTE-Back transformation
+                    //echo $tData['fieldType'];
+                    //if (preg_match('/templavoila_flex/',$key)) { echo "1 -"; }
+                    //echo $key."\n";
+
+                    if ($tData['fieldType'] == 'text' && $tData['isRTE'] || (preg_match('/templavoila_flex/',
+                            $key))
+                    ) {
+                        $dataForTranslationTranformed = $this->xmlTool->RTE2XML($dataForTranslation);
+                        if ($dataForTranslationTranformed !== false) {
+                            $_isTranformedXML = true;
+                            $dataForTranslation = $dataForTranslationTranformed;
+                        }
+                    }
+                    if ($_isTranformedXML) {
+                        return "\t\t" . '<data table="' . $table . '" elementUid="' . $elementUid . '" key="' . $key . '" transformations="1">' . $dataForTranslation . '</data>' . "\n";
+                    } else {
+                        // Substitute HTML entities with actual characters (we use UTF-8 anyway:-) but leave quotes untouched
+                        $dataForTranslation = html_entity_decode($dataForTranslation, ENT_NOQUOTES,
+                            'UTF-8');
+                        //Substitute & with &amp; in non-RTE fields
+                        $dataForTranslation = preg_replace('/&(?!(amp|nbsp|quot|apos|lt|gt);)/',
+                            '&amp;', $dataForTranslation);
+                        //Substitute > and < in non-RTE fields
+                        $dataForTranslation = str_replace(' < ', ' &lt; ', $dataForTranslation);
+                        $dataForTranslation = str_replace(' > ', ' &gt; ', $dataForTranslation);
+                        $dataForTranslation = str_replace('<br>', '<br/>', $dataForTranslation);
+                        $dataForTranslation = str_replace('<hr>', '<hr/>', $dataForTranslation);
+                        //$dataForTranslation = \TYPO3\CMS\Core\Utility\GeneralUtility::deHSCentities($dataForTranslation);
+
+                        $params = $GLOBALS['BE_USER']->getModuleData('l10nmgr/cm1/prefs', 'prefs');
+                        if ($params['utf8'] == '1') {
+                            $dataForTranslation = Utf8Tools::utf8_bad_strip($dataForTranslation);
+                        }
+                        if ($this->xmlTool->isValidXMLString($dataForTranslation)) {
+                            return "\t\t" . '<data table="' . $table . '" elementUid="' . $elementUid . '" key="' . $key . '">' . $dataForTranslation . '</data>' . "\n";
+                        } else {
+                            if ($params['noxmlcheck'] == '1') {
+                                return "\t\t" . '<data table="' . $table . '" elementUid="' . $elementUid . '" key="' . $key . '"><![CDATA[' . $dataForTranslation . ']]></data>' . "\n";
+                            } else {
+                                $this->setInternalMessage($GLOBALS['LANG']->getLL('export.process.error.invalid.message'),
+                                    $elementUid . '/' . $table . '/' . $key);
+                            }
+                        }
+                    }
+                } else {
+                    $this->setInternalMessage($GLOBALS['LANG']->getLL('export.process.error.empty.message'),
+                        $elementUid . '/' . $table . '/' . $key);
+                }
+            }
+        }
+
+        return null;
     }
 }
