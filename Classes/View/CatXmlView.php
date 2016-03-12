@@ -24,6 +24,9 @@ namespace Localizationteam\L10nmgr\View;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use DOMDocument;
+use DOMNode;
+use Localizationteam\L10nmgr\Model\Tools\DOMTools;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -43,7 +46,15 @@ use Localizationteam\L10nmgr\Model\Tools\Utf8Tools;
  */
 class CatXmlView extends AbstractExportView
 {
+    /**
+     * @var XmlTools
+     */
     protected $xmlTool;
+
+    /**
+     * @var DOMTools
+     */
+    protected $domTool;
 
     /**
      * @var  integer $forcedSourceLanguage Overwrite the default language uid with the desired language to export
@@ -57,29 +68,41 @@ class CatXmlView extends AbstractExportView
      */
     protected $targetIso;
 
+    /**
+     * @var DOMDocument
+     */
+    protected $domDocument;
+
 
     function __construct($l10ncfgObj, $sysLang)
     {
         $this->xmlTool = GeneralUtility::makeInstance(XmlTools::class);
+        $this->domTool = GeneralUtility::makeInstance(DOMTools::class);
         parent::__construct($l10ncfgObj, $sysLang);
     }
 
     /**
      * Render the simple XML export
      *
-     * @param  array    Translation data for configuration
-     * @return  string    Filename
+     * @return string filename
      */
     function render()
     {
         global $LANG, $BE_USER;
 
+        $this->domDocument = new DOMDocument();
+
         $sysLang = $this->sysLang;
+
+        /** @var  $accumObj */
         $accumObj = $this->l10ncfgObj->getL10nAccumulatedInformationsObjectForLanguage($sysLang);
         if ($this->forcedSourceLanguage) {
             $accumObj->setForcedPreviewLanguage($this->forcedSourceLanguage);
         }
         $accum = $accumObj->getInfoArray();
+
+
+
 
         $output = [];
 
@@ -177,7 +200,12 @@ class CatXmlView extends AbstractExportView
 
         if (is_array($data['fields'])) {
             foreach ($data['fields'] as $key => $tData) {
-                $output[] = $this->xmlForField($table, $elementUid, $key, $tData);
+                /** @var \DOMElement $xmlElement */
+                $xmlElement = $this->xmlForField($table, $elementUid, $key, $tData);
+                if(! is_null($xmlElement)) {
+                    $output[] = $this->domDocument->saveXML($xmlElement);
+                }
+
             }
         }
 
@@ -189,7 +217,8 @@ class CatXmlView extends AbstractExportView
      * @param $elementUid
      * @param $tData
      * @param $key
-     * @return string
+     *
+     * @return DOMNode
      */
     protected function xmlForField($table, $elementUid, $key, $tData)
     {
@@ -203,6 +232,19 @@ class CatXmlView extends AbstractExportView
 
                 // @DP: Why this check?
                 if (($this->forcedSourceLanguage && isset($tData['previewLanguageValues'][$this->forcedSourceLanguage])) || $this->forcedSourceLanguage === false) {
+
+                    // build basic XMLElement for field
+                    $attributes = [
+                        'table' => $table,
+                        'elementUid' => $elementUid,
+                        'key' => $key,
+                    ];
+
+                    $fieldNode = $this->domDocument->createElement('data');
+                    foreach($attributes as $key => $value) {
+                        $fieldNode->setAttribute($key, $value);
+                    }
+
 
                     if ($this->forcedSourceLanguage) {
                         $dataForTranslation = $tData['previewLanguageValues'][$this->forcedSourceLanguage];
@@ -227,8 +269,12 @@ class CatXmlView extends AbstractExportView
                             $dataForTranslation = $dataForTranslationTranformed;
                         }
                     }
+
                     if ($_isTranformedXML) {
-                        return "\t\t" . '<data table="' . $table . '" elementUid="' . $elementUid . '" key="' . $key . '" transformations="1">' . $dataForTranslation . '</data>' . "\n";
+                        $fieldNode->setAttribute('transformations', 1);
+                        $this->domTool->appendHTML($fieldNode, $dataForTranslation);
+                        return $fieldNode;
+
                     } else {
                         // Substitute HTML entities with actual characters (we use UTF-8 anyway:-) but leave quotes untouched
                         $dataForTranslation = html_entity_decode($dataForTranslation, ENT_NOQUOTES,
@@ -248,10 +294,12 @@ class CatXmlView extends AbstractExportView
                             $dataForTranslation = Utf8Tools::utf8_bad_strip($dataForTranslation);
                         }
                         if ($this->xmlTool->isValidXMLString($dataForTranslation)) {
-                            return "\t\t" . '<data table="' . $table . '" elementUid="' . $elementUid . '" key="' . $key . '">' . $dataForTranslation . '</data>' . "\n";
+                            $fieldNode->appendChild($this->domDocument->createTextNode($dataForTranslation));
+                            return $fieldNode;
                         } else {
                             if ($params['noxmlcheck'] == '1') {
-                                return "\t\t" . '<data table="' . $table . '" elementUid="' . $elementUid . '" key="' . $key . '"><![CDATA[' . $dataForTranslation . ']]></data>' . "\n";
+                                $fieldNode->appendChild($this->domDocument->createCDATASection($dataForTranslation));
+                                return $fieldNode;
                             } else {
                                 $this->setInternalMessage($GLOBALS['LANG']->getLL('export.process.error.invalid.message'),
                                     $elementUid . '/' . $table . '/' . $key);

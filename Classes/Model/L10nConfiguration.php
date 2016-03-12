@@ -91,7 +91,7 @@ class L10nConfiguration
      *
      * @param int $sysLang sys_language_uid
      * @param mixed $overrideStartingPoint optional override startingpoint  TODO!
-     * @return L10nAccumulatedInformations
+     * @return L10nAccumulatedInformation
      **/
     function getL10nAccumulatedInformationsObjectForLanguage($sysLang, $overrideStartingPoint = '')
     {

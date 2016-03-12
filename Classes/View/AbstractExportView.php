@@ -26,6 +26,7 @@ namespace Localizationteam\L10nmgr\View;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+use Localizationteam\L10nmgr\Model\L10nConfiguration;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
@@ -44,9 +45,10 @@ abstract class AbstractExportView
 {
 
     /**
-     * @var  L10nConfiguration The language configuration object
+     * @var L10nConfiguration The language configuration object
      */
     var $l10ncfgObj;
+
     /**
      * @var  integer The sys_language_uid of language to export
      */
