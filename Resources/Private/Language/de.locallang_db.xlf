@@ -15,9 +15,8 @@
 				<source>Export filenameprefix:</source>
 				<target>Exportpräfix:</target>
 			</trans-unit>
-			<trans-unit id="tx_l10nmgr_cfg.incfcewithdefaultall" xml:space="preserve" approved="yes">
-				<source>Include FCE with default language:</source>
-				<target></target>
+			<trans-unit id="tx_l10nmgr_cfg.nest_inline_records" xml:space="preserve">
+				<target>Inline Elemente verschachtelt ausgeben</target>
 			</trans-unit>
 			<trans-unit id="tx_l10nmgr_cfg.depth.I.0" xml:space="preserve" approved="yes">
 				<source>This page only</source>

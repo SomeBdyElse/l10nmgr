@@ -114,6 +114,14 @@ return array(
                 'maxitems' => 1,
             )
         ),
+        'nest_inline_records' => array(
+            'exclude' => 1,
+            'label' => $l10n . ':tx_l10nmgr_cfg.nest_inline_records',
+            'config' => array(
+                'type' => 'check',
+                'default' => '0'
+            )
+        ),
         'incfcewithdefaultlanguage' => array(
             'exclude' => 1,
             'label' => $l10n . ':tx_l10nmgr_cfg.incfcewithdefaultall',
@@ -124,7 +132,7 @@ return array(
         ),
     ),
     'types' => array(
-        '0' => array('showitem' => 'title,filenameprefix;;;;2-2-2, depth;;;;3-3-3, sourceLangStaticId, tablelist, exclude, include, displaymode, incfcewithdefaultlanguage')
+        '0' => array('showitem' => 'title,filenameprefix;;;;2-2-2, depth;;;;3-3-3, sourceLangStaticId, tablelist, exclude, include, displaymode, nest_inline_records, incfcewithdefaultlanguage')
     ),
     'palettes' => array(
         '1' => array('showitem' => '')

@@ -15,6 +15,9 @@
 			<trans-unit id="tx_l10nmgr_cfg.incfcewithdefaultall" xml:space="preserve">
 				<source>Include FCE with default language:</source>
 			</trans-unit>
+			<trans-unit id="tx_l10nmgr_cfg.nest_inline_records" xml:space="preserve">
+				<source>Nest inline records:</source>
+			</trans-unit>
 			<trans-unit id="tx_l10nmgr_cfg.depth.I.0" xml:space="preserve">
 				<source>This page only</source>
 			</trans-unit>

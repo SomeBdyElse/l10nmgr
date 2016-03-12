@@ -24,7 +24,9 @@ namespace Localizationteam\L10nmgr\Model;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use Localizationteam\L10nmgr\Model\Tools\InlineRelationTool;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Database\RelationHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Localizationteam\L10nmgr\Model\Tools\Tools;
 
@@ -233,7 +235,12 @@ class L10nAccumulatedInformation
             }
         }
 
-#		debug($accum);
+        if($this->l10ncfg['nest_inline_records']) {
+            /** @var InlineRelationTool $inlineRelationTool */
+            $inlineRelationTool = GeneralUtility::makeInstance(InlineRelationTool::class, $this->l10ncfg);
+            $inlineRelationTool->addNestingInformation($accum);
+        }
+
         $this->_accumulatedInformations = $accum;
     }
 
