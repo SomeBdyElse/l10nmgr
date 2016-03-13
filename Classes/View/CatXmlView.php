@@ -25,6 +25,7 @@ namespace Localizationteam\L10nmgr\View;
  ***************************************************************/
 
 use DOMDocument;
+use DOMElement;
 use DOMNode;
 use Localizationteam\L10nmgr\Model\Tools\DOMTools;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
@@ -109,7 +110,16 @@ class CatXmlView extends AbstractExportView
             $output[] = "\t" . '<pageGrp id="' . $pId . '" sourceUrl="' . GeneralUtility::getIndpEnv("TYPO3_SITE_URL") . 'index.php?id=' . $pId . '">' . "\n";
             foreach ($accum[$pId]['items'] as $table => $elements) {
                 foreach ($elements as $elementUid => $data) {
-                    $output[] = $this->getXmlForRecord($table, $elementUid, $data);
+                    $skipRecordAsInlineChild = (
+                        $this->l10ncfgObj->getData('nest_inline_records')
+                        && array_key_exists('isInlineChild', $data)
+                        && $data['isInlineChild'] == TRUE
+                    );
+
+                    if(! $skipRecordAsInlineChild) {
+                        $xmlForRecord = $this->getXmlForRecord($table, $elementUid, $data);
+                        $output[] = $xmlForRecord->ownerDocument->saveXML($xmlForRecord);
+                    }
                 }
             }
             $output[] = "\t" . '</pageGrp>' . "\r";
@@ -132,7 +142,8 @@ class CatXmlView extends AbstractExportView
         }
 
         $XML = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $XML .= '<!DOCTYPE TYPO3L10N [ <!ENTITY nbsp " "> ]>' . "\n" . '<TYPO3L10N>' . "\n";
+        $XML .= '<!DOCTYPE TYPO3L10N>' . "\n";
+        $XML .= '<TYPO3L10N>' . "\n";
         $XML .= "\t" . '<head>' . "\n";
         $XML .= "\t\t" . '<t3_l10ncfg>' . $this->l10ncfgObj->getData('uid') . '</t3_l10ncfg>' . "\n";
         $XML .= "\t\t" . '<t3_sysLang>' . $sysLang . '</t3_sysLang>' . "\n";
@@ -186,7 +197,7 @@ class CatXmlView extends AbstractExportView
      * @param $table
      * @param $elementUid
      * @param $data
-     * @return array
+     * @return DOMElement
      */
     protected function getXmlForRecord($table, $elementUid, $data)
     {
@@ -194,20 +205,46 @@ class CatXmlView extends AbstractExportView
             $this->targetIso = $data['ISOcode'];
         }
 
-        $output = [];
+        $recordElement = $this->domDocument->createElement('record');
+        $recordElement->setAttribute('table', $data['translationInfo']['table']);
+        $recordElement->setAttribute('uid', $data['translationInfo']['uid']);
 
         if (is_array($data['fields'])) {
             foreach ($data['fields'] as $key => $tData) {
-                /** @var \DOMElement $xmlElement */
+                /** @var DOMElement $xmlElement */
                 $xmlElement = $this->xmlForField($table, $elementUid, $key, $tData);
                 if(! is_null($xmlElement)) {
-                    $output[] = $this->domDocument->saveXML($xmlElement);
+                    $recordElement->appendChild($xmlElement);
                 }
 
             }
         }
 
-        return implode('', $output);
+        if (
+            $this->l10ncfgObj->getData('nest_inline_records')
+            && is_array($data['inlineChildren'])
+        ) {
+            foreach($data['inlineChildren'] as $fieldName => $records) {
+
+                if(count($records) > 0) {
+                    $fieldElement = $this->domDocument->createElement('inlineRecords');
+                    $fieldElement->setAttribute('table', $table);
+                    $fieldElement->setAttribute('uid', $elementUid);
+                    $fieldElement->setAttribute('field', $fieldName);
+
+                    foreach($records as $record) {
+                        $fieldElement->appendChild(
+                            $this->getXmlForRecord($record['table'], $record['uid'], $record)
+                        );
+                    }
+
+                    $recordElement->appendChild($fieldElement);
+                }
+
+            }
+        }
+
+        return $recordElement;
     }
 
     /**
@@ -227,9 +264,18 @@ class CatXmlView extends AbstractExportView
             $noChangeFlag = !strcmp(trim($tData['diffDefaultValue']), trim($tData['defaultValue']));
 
             if (!$this->modeOnlyChanged || !$noChangeFlag) {
-
-                // @DP: Why this check?
-                if (($this->forcedSourceLanguage && isset($tData['previewLanguageValues'][$this->forcedSourceLanguage])) || $this->forcedSourceLanguage === false) {
+                if (
+                    ! $this->forcedSourceLanguage
+                    || (
+                        $this->forcedSourceLanguage
+                        && isset($tData['previewLanguageValues'][$this->forcedSourceLanguage])
+                    )
+                ) {
+                    if ($this->forcedSourceLanguage) {
+                        $dataForTranslation = $tData['previewLanguageValues'][$this->forcedSourceLanguage];
+                    } else {
+                        $dataForTranslation = $tData['defaultValue'];
+                    }
 
                     // build basic XMLElement for field
                     $attributes = [
@@ -239,74 +285,12 @@ class CatXmlView extends AbstractExportView
                     ];
 
                     $fieldNode = $this->domDocument->createElement('data');
-                    foreach($attributes as $key => $value) {
+                    foreach ($attributes as $key => $value) {
                         $fieldNode->setAttribute($key, $value);
                     }
 
-
-                    if ($this->forcedSourceLanguage) {
-                        $dataForTranslation = $tData['previewLanguageValues'][$this->forcedSourceLanguage];
-                    } else {
-                        $dataForTranslation = $tData['defaultValue'];
-                    }
-                    $_isTranformedXML = false;
-                    // Following checks are not enough! Fields that could be transformed to be XML conform are not transformed! textpic fields are not isRTE=1!!! No idea why...
-                    //DZ 2010-09-08
-                    // > if > else loop instead of ||
-                    // Test re-import of XML! RTE-Back transformation
-                    //echo $tData['fieldType'];
-                    //if (preg_match('/templavoila_flex/',$key)) { echo "1 -"; }
-                    //echo $key."\n";
-
-                    if ($tData['fieldType'] == 'text' && $tData['isRTE'] || (preg_match('/templavoila_flex/',
-                            $key))
-                    ) {
-                        $dataForTranslationTranformed = $this->xmlTool->RTE2XML($dataForTranslation);
-                        if ($dataForTranslationTranformed !== false) {
-                            $_isTranformedXML = true;
-                            $dataForTranslation = $dataForTranslationTranformed;
-                        }
-                    }
-
-                    if ($_isTranformedXML) {
-                        $fieldNode->setAttribute('transformations', 1);
-                        $this->domTool->appendHTML($fieldNode, $dataForTranslation);
-                        return $fieldNode;
-
-                    } else {
-                        // Substitute HTML entities with actual characters (we use UTF-8 anyway:-) but leave quotes untouched
-                        $dataForTranslation = html_entity_decode($dataForTranslation, ENT_NOQUOTES,
-                            'UTF-8');
-                        //Substitute & with &amp; in non-RTE fields
-                        $dataForTranslation = preg_replace('/&(?!(amp|nbsp|quot|apos|lt|gt);)/',
-                            '&amp;', $dataForTranslation);
-                        //Substitute > and < in non-RTE fields
-                        $dataForTranslation = str_replace(' < ', ' &lt; ', $dataForTranslation);
-                        $dataForTranslation = str_replace(' > ', ' &gt; ', $dataForTranslation);
-                        $dataForTranslation = str_replace('<br>', '<br/>', $dataForTranslation);
-                        $dataForTranslation = str_replace('<hr>', '<hr/>', $dataForTranslation);
-                        //$dataForTranslation = \TYPO3\CMS\Core\Utility\GeneralUtility::deHSCentities($dataForTranslation);
-
-                        $params = $GLOBALS['BE_USER']->getModuleData('l10nmgr/cm1/prefs', 'prefs');
-                        if ($params['utf8'] == '1') {
-                            $dataForTranslation = Utf8Tools::utf8_bad_strip($dataForTranslation);
-                        }
-                        if ($this->xmlTool->isValidXMLString($dataForTranslation)) {
-                            $fieldNode->appendChild($this->domDocument->createTextNode($dataForTranslation));
-                            return $fieldNode;
-                        } else {
-                            if ($params['noxmlcheck'] == '1') {
-                                $fieldNode->appendChild($this->domDocument->createCDATASection($dataForTranslation));
-                                return $fieldNode;
-                            } else {
-                                $this->setInternalMessage($GLOBALS['LANG']->getLL('export.process.error.invalid.message'),
-                                    $elementUid . '/' . $table . '/' . $key);
-                            }
-                        }
-                    }
-                } else {
-                    $this->setInternalMessage($GLOBALS['LANG']->getLL('export.process.error.empty.message'),
-                        $elementUid . '/' . $table . '/' . $key);
+                    $fieldNode->appendChild($this->domDocument->createCDATASection($dataForTranslation));
+                    return $fieldNode;
                 }
             }
         }

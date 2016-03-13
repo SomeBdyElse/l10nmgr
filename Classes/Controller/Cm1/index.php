@@ -23,6 +23,10 @@ namespace Localizationteam\L10nmgr\Controller\Cm1;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+use Exception;
+use Localizationteam\L10nmgr\Model\CatXmlImporter;
+use Localizationteam\L10nmgr\Model\CatXmlImportManagerOptions;
+use Localizationteam\L10nmgr\Model\CatXmlImportManagerRewrite;
 use Localizationteam\L10nmgr\View\AbstractExportView;
 use TYPO3\CMS\Backend\Module\BaseScriptClass;
 use TYPO3\CMS\Backend\Configuration\TranslationConfigurationProvider;
@@ -476,9 +480,6 @@ class Cm1 extends BaseScriptClass
             'sdlpassolo' => 'SDLPassolo.xfg',
         );
 
-        /** @var $service L10nBaseService */
-        $service = GeneralUtility::makeInstance(L10nBaseService::class);
-
         $info = '<br/>';
         $info .= '<input type="submit" value="' . $GLOBALS['LANG']->getLL('general.action.refresh.button.title') . '" name="_" /><br /><br/>';
 
@@ -519,6 +520,9 @@ class Cm1 extends BaseScriptClass
         $info .= $this->doc->icons(1) .
             $GLOBALS['LANG']->getLL('file.settings.available.title');
 
+        /** @var $service L10nBaseService */
+        $service = GeneralUtility::makeInstance(L10nBaseService::class);
+
         for (reset($allowedSettingFiles); list($settingId, $settingFileName) = each($allowedSettingFiles);) {
             $currentFile = GeneralUtility::resolveBackPath($BACK_PATH . \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('l10nmgr') . 'settings/' . $settingFileName);
 
@@ -556,36 +560,18 @@ class Cm1 extends BaseScriptClass
                 $service->saveTranslation($l10ncfgObj, $translationData);
                 $actionInfo .= '<br/><br/>' . $this->doc->icons(1) . 'Import done<br/><br/>(Command count:' . $service->lastTCEMAINCommandsCount . ')';
             } else {
+
                 // Relevant processing of XML Import with the help of the Importmanager
-                /** @var $importManager CatXmlImportManager */
-                $importManager = GeneralUtility::makeInstance(CatXmlImportManager::class,
-                    $uploadedTempFile,
-                    $this->sysLanguage, $xmlString = "");
-                if ($importManager->parseAndCheckXMLFile() === false) {
-                    $actionInfo .= '<br/><br/>' . $this->doc->header($GLOBALS['LANG']->getLL('import.error.title')) . $importManager->getErrorMessages();
-                } else {
-                    if (GeneralUtility::_POST('import_delL10N') == '1') {
-                        $actionInfo .= $GLOBALS['LANG']->getLL('import.xml.delL10N.message') . '<br/>';
-                        $delCount = $importManager->delL10N($importManager->getDelL10NDataFromCATXMLNodes($importManager->xmlNodes));
-                        $actionInfo .= sprintf($GLOBALS['LANG']->getLL('import.xml.delL10N.count.message'),
-                                $delCount) . '<br/><br/>';
-                    }
-                    if (GeneralUtility::_POST('make_preview_link') == '1') {
-                        $pageIds = $importManager->getPidsFromCATXMLNodes($importManager->xmlNodes);
-                        $actionInfo .= '<b>' . $GLOBALS['LANG']->getLL('import.xml.preview_links.title') . '</b><br/>';
-                        /** @var $mkPreviewLinks MkPreviewLinkService */
-                        $mkPreviewLinks = GeneralUtility::makeInstance(MkPreviewLinkService::class,
-                            $t3_workspaceId = $importManager->headerData['t3_workspaceId'],
-                            $t3_sysLang = $importManager->headerData['t3_sysLang'], $pageIds);
-                        $actionInfo .= $mkPreviewLinks->renderPreviewLinks($mkPreviewLinks->mkPreviewLinks());
-                    }
-                    $translationData = $factory->getTranslationDataFromCATXMLNodes($importManager->getXMLNodes());
-                    $translationData->setLanguage($this->sysLanguage);
-                    //$actionInfo.="<pre>".var_export($GLOBALS['BE_USER'],true)."</pre>";
-                    unset($importManager);
-                    $service->saveTranslation($l10ncfgObj, $translationData);
-                    $actionInfo .= '<br/>' . $this->doc->icons(-1) . $GLOBALS['LANG']->getLL('import.xml.done.message') . '<br/><br/>(Command count:' . $service->lastTCEMAINCommandsCount . ')';
-                }
+                /** @var CatXmlImporter $importManager */
+                $importManager = GeneralUtility::makeInstance(
+                    CatXmlImporter::class,
+                    GeneralUtility::_POST('import_asdefaultlanguage') == '1', // asDefaultLanguage
+                    GeneralUtility::_POST('import_delL10N') == '1', // delete existing translation
+                    GeneralUtility::_POST('make_preview_link') == '1' // generate preview link
+                );
+
+                $importManager->importFromFile($uploadedTempFile);
+                $actionInfo = $importManager->getActionInfoAsString();
             }
             GeneralUtility::unlink_tempfile($uploadedTempFile);
         }
@@ -629,7 +615,7 @@ class Cm1 extends BaseScriptClass
                         $message = sprintf($GLOBALS['LANG']->getLL('export.ftp.success.detail'),
                             $this->lConf['ftp_server_path'] . $filename);
                         $status = FlashMessage::OK;
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         // Prepare an error message for display
                         $title = $GLOBALS['LANG']->getLL('export.ftp.error');
                         $message = $e->getMessage() . ' (' . $e->getCode() . ')';
@@ -651,7 +637,7 @@ class Cm1 extends BaseScriptClass
                         $title = $GLOBALS['LANG']->getLL('export.download.success');
                         $message = sprintf($GLOBALS['LANG']->getLL('export.download.success.detail'), $link);
                         $status = FlashMessage::OK;
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         // Prepare an error message for display
                         $title = $GLOBALS['LANG']->getLL('export.download.error');
                         $message = $e->getMessage() . ' (' . $e->getCode() . ')';

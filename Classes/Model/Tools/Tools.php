@@ -47,7 +47,7 @@ class Tools
     var $filters = array(
         'fieldTypes' => 'text,input',
         'noEmptyValues' => true,
-        'noIntegers' => true,
+        'noIntegers' => FALSE,
         'l10n_categories' => '' // could be "text,media" for instance.
     ); // Array of sys_language_uids, eg. array(1,2)
     var $previewLanguages = array(); // If TRUE, when fields are not included there will be shown a detailed explanation.
@@ -176,9 +176,9 @@ class Tools
                 if ($TCEformsCfg['l10n_mode'] == 'mergeIfNotBlank') {
                     $msg .= 'This field is optional. If not filled in, the default language value will be used.';
                 }
-                if (GeneralUtility::inList('shortcut,shortcut_mode,urltype,url_scheme',
-                        $kFieldName) && GeneralUtility::inList('pages,pages_language_overlay',
-                        $kTableName)
+                if (
+                    GeneralUtility::inList('shortcut,shortcut_mode,urltype,url_scheme', $kFieldName)
+                    && GeneralUtility::inList('pages,pages_language_overlay', $kTableName)
                 ) {
                     $this->bypassFilter = true;
                 }
@@ -474,6 +474,9 @@ class Tools
             $this->detailsOutput['translationInfo'] = $tInfo;
             $this->sysLanguages = $this->getSystemLanguages();
             $this->detailsOutput['ISOcode'] = $this->sysLanguages[$sysLang]['ISOcode'];
+            $this->detailsOutput['table'] = $table;
+            $this->detailsOutput['uid'] = $row['uid'];
+
 
             //decide how translations are stored:
             // there are three ways: flexformInternalTranslation (for FCE with langChildren)

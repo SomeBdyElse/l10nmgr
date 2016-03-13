@@ -67,6 +67,11 @@ class L10nBaseService
      */
     protected $depthCounter = 0;
 
+    /**
+     * @var int
+     */
+    public $lastTCEMAINCommandsCount = 0;
+
     public function __construct()
     {
         // Load the extension's configuration
