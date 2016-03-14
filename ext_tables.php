@@ -47,49 +47,6 @@ if (TYPO3_MODE == "BE") {
 			)
 		)
 	);
-
-	/**
-     * Registers a Backend Module
-     */
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addModule(
-        'user',
-        'txl10nmgrM2', // Submodule key
-        'top',    // Position
-        $extPath . 'Classes/Modules/Module2/',
-        array(
-            'script' => '_DISPATCH',
-            'access' => 'user,group',
-            'name' => 'user_txl10nmgrM2',
-            'labels' => array(
-                'tabs_images' => array(
-                    'tab' => '../../../Resources/Public/Icons/module2_icon.gif',
-                ),
-                'll_ref' => 'LLL:EXT:l10nmgr/Resources/Private/Language/Modules/Module2/locallang_mod.xlf'
-            )
-        )
-    );
-
-	/**
-	 * Registers a Backend Module
-	 */
-	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addModule(
-		'xMOD',
-		'Module2List', // Submodule key
-		'',    // Position
-		$extPath . 'Classes/Modules/Module2List/',
-		array(
-			'script' => '_DISPATCH',
-			'access' => 'user,group',
-			'name' => 'xMOD_Module2List',
-			'labels' => array(
-				'tabs_images' => array(
-					'tab' => '../../../Resources/Public/Icons/module1_icon.gif',
-				),
-				'll_ref' => 'LLL:EXT:l10nmgr/Resources/Private/Language/Modules/Module2/locallang_mod.xlf'
-			)
-		)
-	);
-
 }
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages("tx_l10nmgr_cfg");
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('tx_l10nmgr_cfg',
@@ -103,11 +60,6 @@ if (TYPO3_MODE == "BE") {
 //$TCA['tt_content']['columns']['image']['l10n_display'] = 'defaultAsReadonly';
 
     if (TYPO3_MODE == "BE") {
-        $GLOBALS["TBE_MODULES_EXT"]["xMOD_alt_clickmenu"]["extendCMclasses"][] = array(
-            "name" => "Localizationteam\\L10nmgr\\ClickMenu",
-            "path" => $extPath . "Classes/ClickMenu.php"
-        );
-
         // Add context sensitive help (csh) for the Scheduler tasks
         \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('_tasks_txl10nmgr',
             'EXT:l10nmgr/Resources/Private/Language/Task/locallang_csh_tasks.xlf');
