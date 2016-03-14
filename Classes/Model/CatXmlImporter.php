@@ -1,9 +1,6 @@
 <?php
 namespace Localizationteam\L10nmgr\Model;
 
-use DOMElement;
-use DOMNode;
-use DOMXPath;
 use TYPO3\CMS\Core\FormProtection\Exception;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
