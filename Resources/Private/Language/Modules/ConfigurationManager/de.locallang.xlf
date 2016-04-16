@@ -19,6 +19,10 @@
 				um mit dem Export/Import zu beginnen.
 			</target>
 			</trans-unit>
+			<trans-unit id="general.list.configuration.manager" xml:space="preserve">
+				<source>Configuration Manager</source>
+				<target>Konfigurations-Verwaltung</target>
+			</trans-unit>
 			<trans-unit id="general.list.configuration.title" xml:space="preserve" approved="yes">
 				<source>Available configurations:</source>
 				<target>Verfügbare Konfigurationen:</target>

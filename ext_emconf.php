@@ -2,9 +2,7 @@
 
 /***************************************************************
  * Extension Manager/Repository config file for ext "l10nmgr".
- *
  * Auto generated 10-03-2015 18:54
- *
  * Manual updates:
  * Only the data in the array - everything else is removed by next
  * writing. "version" and "dependencies" must not be touched!
@@ -24,27 +22,23 @@ $EM_CONF[$_EXTKEY] = array(
     'state' => 'beta',
     'uploadfolder' => false,
     'createDirs' => 'uploads/tx_l10nmgr/settings,uploads/tx_l10nmgr/saved_files,uploads/tx_l10nmgr/jobs,uploads/tx_l10nmgr/jobs/out,uploads/tx_l10nmgr/jobs/in,uploads/tx_l10nmgr/jobs/done,uploads/tx_l10nmgr/jobs/_cmd',
-	'modify_tables' => '',
+    'modify_tables' => '',
     'clearcacheonload' => true,
-	'lockType' => '',
+    'lockType' => '',
     'author' => 'Kasper Skaarhoej, Daniel Zielinski, Daniel Poetzinger, Fabian Seltmann, Andreas Otto, Jo Hasenau, Peter Russ',
     'author_email' => 'kasperYYYY@typo3.com, info@loctimize.com, info@cybercraft.de, pruss@uon.li',
     'author_company' => 'Localization Manager Team',
-	'CGLcompliance' => '',
-	'CGLcompliance_note' => '',
-    'constraints' =>
-        array(
-            'depends' =>
-                array(
-                    'php' => '5.5.0-0.0.0',
-                    'typo3' => '6.2.0-7.99.99',
-                ),
-            'conflicts' =>
-                array(),
-            'suggests' =>
-                array(),
+    'CGLcompliance' => '',
+    'CGLcompliance_note' => '',
+    'constraints' => array(
+        'depends' => array(
+            'php' => '5.5.0-0.0.0',
+            'typo3' => '7.6.0-7.6.99',
         ),
-	'_md5_values_when_last_written' => '',
-	'suggests' => array()
+        'conflicts' => array(),
+        'suggests' => array(),
+    ),
+    '_md5_values_when_last_written' => '',
+    'suggests' => array()
 );
 

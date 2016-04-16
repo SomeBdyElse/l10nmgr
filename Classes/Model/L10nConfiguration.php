@@ -19,9 +19,10 @@ namespace Localizationteam\L10nmgr\Model;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Backend\Utility\IconUtility;
 use TYPO3\CMS\Backend\Tree\View\PageTreeView;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Imaging\Icon;
+use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -43,6 +44,7 @@ class L10nConfiguration
      * loads internal array with l10nmgrcfg record
      *
      * @param int $id Id of the cfg record
+     *
      * @return void
      **/
     function load($id)
@@ -79,6 +81,7 @@ class L10nConfiguration
      * get a field of the current cfgr record
      *
      * @param string $key Key of the field. E.g. title,uid...
+     *
      * @return string Value of the field
      **/
     function getData($key)
@@ -91,19 +94,20 @@ class L10nConfiguration
      *
      * @param int $sysLang sys_language_uid
      * @param mixed $overrideStartingPoint optional override startingpoint  TODO!
+     *
      * @return L10nAccumulatedInformation
      **/
     function getL10nAccumulatedInformationsObjectForLanguage($sysLang, $overrideStartingPoint = '')
     {
 
         $l10ncfg = $this->l10ncfg;
-	    $treeStartingRecord = array();
-	    // Showing the tree:
+        $treeStartingRecord = array();
+        // Showing the tree:
         // Initialize starting point of page tree:
         $treeStartingPoint = $l10ncfg['depth'] == -1 ? (int)GeneralUtility::_GET('srcPID') : (int)$l10ncfg['pid'];
-	    if ($treeStartingRecord > 0) {
-	        $treeStartingRecord = BackendUtility::getRecordWSOL('pages', $treeStartingPoint);
-	    }
+        if ($treeStartingPoint > 0) {
+            $treeStartingRecord = BackendUtility::getRecordWSOL('pages', $treeStartingPoint);
+        }
         $depth = $l10ncfg['depth'];
 
         // Initialize tree object:
@@ -112,8 +116,8 @@ class L10nConfiguration
         $tree->init('AND ' . $GLOBALS['BE_USER']->getPagePermsClause(1));
         $tree->addField('l18n_cfg');
 
-        // Creating top icon; the current page
-        $HTML = IconUtility::getSpriteIconForRecord('pages', $treeStartingRecord);
+        $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
+        $HTML = $iconFactory->getIconForRecord('pages', $treeStartingRecord, Icon::SIZE_SMALL)->render();
         $tree->tree[] = array(
             'row' => $treeStartingRecord,
             'HTML' => $HTML
@@ -125,8 +129,7 @@ class L10nConfiguration
 
         //now create and init accum Info object:
         /** @var $accumObj L10nAccumulatedInformation */
-        $accumObj = GeneralUtility::makeInstance(L10nAccumulatedInformation::class,
-            $tree, $l10ncfg, $sysLang);
+        $accumObj = GeneralUtility::makeInstance(L10nAccumulatedInformation::class, $tree, $l10ncfg, $sysLang);
 
         return $accumObj;
     }

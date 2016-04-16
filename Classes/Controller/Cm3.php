@@ -3,24 +3,19 @@ namespace Localizationteam\L10nmgr\Controller\Cm3;
 
 /***************************************************************
  *  Copyright notice
- *
  *  (c) 2007 Kasper Skårhøj <kasperYYYY@typo3.com>
  *  All rights reserved
- *
  *  This script is part of the TYPO3 project. The TYPO3 project is
  *  free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
- *
  *  The GNU General Public License can be found at
  *  http://www.gnu.org/copyleft/gpl.html.
- *
  *  This script is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 /**
@@ -30,9 +25,6 @@ namespace Localizationteam\L10nmgr\Controller\Cm3;
  */
 /**
  * [CLASS/FUNCTION INDEX of SCRIPT]
- *
- *
- *
  *   65: class tx_l10nmgr_cm3 extends t3lib_SCbase
  *   72:     function menuConfig()
  *   83:     function main()
@@ -40,10 +32,9 @@ namespace Localizationteam\L10nmgr\Controller\Cm3;
  *  119:     function printContent()
  *  132:     function moduleContent($table,$uid)
  *  199:     function makeTableRow($rec)
- *
  * TOTAL FUNCTIONS: 6
  * (This index is automatically created/updated by the extension "extdeveval")
- *
+
  */
 
 // DEFAULT initialization of a module [BEGIN]
@@ -51,9 +42,9 @@ unset($MCONF);
 require('conf.php');
 require($BACK_PATH . 'init.php');
 $LANG->includeLLFile('EXT:l10nmgr/cm3/locallang.xml');
+use Localizationteam\L10nmgr\Model\Tools\Tools;
 use TYPO3\CMS\Backend\Template\DocumentTemplate;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Localizationteam\L10nmgr\Model\Tools\Tools;
 
 /**
  * Translation management tool
@@ -62,7 +53,7 @@ use Localizationteam\L10nmgr\Model\Tools\Tools;
  * @package    TYPO3
  * @subpackage tx_l10nmgr
  */
-class Tx_L10nmgr_Controller_Cm3_Index extends \TYPO3\CMS\Backend\Module\BaseScriptClass
+class Cm3 extends BaseScriptClass
 {
 
     /**
@@ -87,12 +78,12 @@ class Tx_L10nmgr_Controller_Cm3_Index extends \TYPO3\CMS\Backend\Module\BaseScri
         global $BE_USER, $LANG, $BACK_PATH, $TCA_DESCR, $TCA, $CLIENT, $TYPO3_CONF_VARS;
 
         // Draw the header.
-        $this->doc = GeneralUtility::makeInstance(DocumentTemplate::class);
-        $this->doc->backPath = $BACK_PATH;
-        $this->doc->form = '<form action="" method="post" enctype="multipart/form-data">';
+        $this->module = GeneralUtility::makeInstance(DocumentTemplate::class);
+        $this->module->backPath = $BACK_PATH;
+        $this->module->form = '<form action="" method="post" enctype="multipart/form-data">';
 
         // JavaScript
-        $this->doc->JScode = '
+        $this->module->JScode = '
 			<script language="javascript" type="text/javascript">
 				script_ended = 0;
 				function jumpToUrl(URL)	{
@@ -102,18 +93,17 @@ class Tx_L10nmgr_Controller_Cm3_Index extends \TYPO3\CMS\Backend\Module\BaseScri
 		';
 
         // Header:
-        $this->content .= $this->doc->startPage($LANG->getLL('title'));
-        $this->content .= $this->doc->header($LANG->getLL('title'));
+        $this->content .= $this->module->startPage($LANG->getLL('title'));
+        $this->content .= $this->module->header($LANG->getLL('title'));
 
-        $this->content .= $this->doc->divider(5);
+        $this->content .= $this->module->divider(5);
 
         // Render the module content (for all modes):
-        $this->content .= $this->doc->section('',
-            $this->moduleContent((string)GeneralUtility::_GP('table'),
-                (int)GeneralUtility::_GP('id'),
+        $this->content .= $this->module->section('',
+            $this->moduleContent((string)GeneralUtility::_GP('table'), (int)GeneralUtility::_GP('id'),
                 GeneralUtility::_GP('cmd')));
 
-        $this->content .= $this->doc->spacer(10);
+        $this->content .= $this->module->spacer(10);
     }
 
     /**
@@ -121,6 +111,7 @@ class Tx_L10nmgr_Controller_Cm3_Index extends \TYPO3\CMS\Backend\Module\BaseScri
      *
      * @param   [type]    $table: ...
      * @param   [type]    $uid: ...
+     *
      * @return  [type]    ...
      */
     function moduleContent($table, $uid, $cmd)
@@ -175,7 +166,7 @@ class Tx_L10nmgr_Controller_Cm3_Index extends \TYPO3\CMS\Backend\Module\BaseScri
     function printContent()
     {
 
-        $this->content .= $this->doc->endPage();
+        $this->content .= $this->module->endPage();
         echo $this->content;
     }
 }

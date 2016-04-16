@@ -3,6 +3,12 @@
 	<file source-language="en" datatype="plaintext" original="messages" date="2015-07-30T00:29:38Z" product-name="l10nmgr">
 		<header/>
 		<body>
+			<trans-unit id="general.action.import.upload.title" xml:space="preserve">
+				<source>Select a file to import</source>
+			</trans-unit>
+			<trans-unit id="general.action.import.upload.button.title" xml:space="preserve">
+				<source>Browse</source>
+			</trans-unit>
 			<trans-unit id="general.action.refresh.button.title" xml:space="preserve">
 				<source>Refresh</source>
 			</trans-unit>
@@ -37,6 +43,12 @@
 				<source>ERROR: User has no access to edit any translations!</source>
 			</trans-unit>
 			<trans-unit id="general.title" xml:space="preserve">
+				<source>L10N Manager</source>
+			</trans-unit>
+			<trans-unit id="general.manager" xml:space="preserve">
+				<source>Localization Manager</source>
+			</trans-unit>
+			<trans-unit id="export.import.title" xml:space="preserve">
 				<source>L10N Export/Import</source>
 			</trans-unit>
 			<trans-unit id="general.export.configuration.title" xml:space="preserve">

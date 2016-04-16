@@ -1,26 +1,21 @@
 <?php
-namespace Localizationteam\L10nmgr\Modules\Module2List;
+namespace Localizationteam\L10nmgr\Controller;
 
 /***************************************************************
  *  Copyright notice
- *
  *  (c) 2007 Kasper Skårhøj <kasperYYYY@typo3.com>
  *  All rights reserved
- *
  *  This script is part of the TYPO3 project. The TYPO3 project is
  *  free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
- *
  *  The GNU General Public License can be found at
  *  http://www.gnu.org/copyleft/gpl.html.
- *
  *  This script is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 /**
@@ -29,26 +24,37 @@ namespace Localizationteam\L10nmgr\Modules\Module2List;
  * @author  Kasper Skårhøj <kasperYYYY@typo3.com>
  */
 
+use Localizationteam\L10nmgr\Hooks\Tcemain;
+use Localizationteam\L10nmgr\Model\Tools\Tools;
 use TYPO3\CMS\Backend\Module\BaseScriptClass;
 use TYPO3\CMS\Backend\Template\DocumentTemplate;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Backend\Utility\IconUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Localizationteam\L10nmgr\Hooks\Tcemain;
-use Localizationteam\L10nmgr\Model\Tools\Tools;
 
-class Module2List extends BaseScriptClass
+class TranslationTasks extends BaseScriptClass
 {
 
     var $pageinfo;
 
-	function init() {
-		$this->MCONF['name'] = 'xMOD_Module2List';
-		$GLOBALS['BE_USER']->modAccess($this->MCONF, 1);
-		$GLOBALS['LANG']->includeLLFile("EXT:l10nmgr/Resources/Private/Language/Modules/Module2/locallang.xlf");
-		parent::init();
-	}
+    /**
+     * main action to be registered in ext_tables.php
+     */
+    public function mainAction()
+    {
+        $this->init();
+        $this->main();
+        $this->printContent();
+    }
+
+    function init()
+    {
+        $this->MCONF['name'] = 'ConfigurationManager_TranslationTasks';
+        $GLOBALS['BE_USER']->modAccess($this->MCONF, 1);
+        $GLOBALS['LANG']->includeLLFile("EXT:l10nmgr/Resources/Private/Language/Modules/Module2/locallang.xlf");
+        parent::init();
+    }
 
     /**
      * Adds items to the ->MOD_MENU array. Used for the function menu selector.
@@ -61,20 +67,20 @@ class Module2List extends BaseScriptClass
         parent::menuConfig();
     }
 
-	/**
-	 * Main function of the module. Write the content to $this->content
-	 * If you chose "web" as main module, you will need to consider the $this->id parameter which will contain the uid-number of the page clicked in the page tree
-	 *
-	 */
+    /**
+     * Main function of the module. Write the content to $this->content
+     * If you chose "web" as main module, you will need to consider the $this->id parameter which will contain the uid-number of the page clicked in the page tree
+
+     */
     function main()
     {
         // Draw the header.
-        $this->doc = GeneralUtility::makeInstance(DocumentTemplate::class);
-        $this->doc->backPath = $GLOBALS['BACK_PATH'];
-        $this->doc->form = '<form action="" method="post">';
+        $this->module = GeneralUtility::makeInstance(DocumentTemplate::class);
+        $this->module->backPath = $GLOBALS['BACK_PATH'];
+        $this->module->form = '<form action="" method="post">';
 
         // JavaScript
-        $this->doc->JScode = '
+        $this->module->JScode = '
 			<script language="javascript" type="text/javascript">
 				script_ended = 0;
 				function jumpToUrl(URL)	{
@@ -84,26 +90,26 @@ class Module2List extends BaseScriptClass
 		';
 
         // Setting up the context sensitive menu:
-        $CMparts = $this->doc->getContextMenuCode();
-        $this->doc->JScode .= $CMparts[0];
-        $this->doc->bodyTagAdditions = $CMparts[1];
-        $this->doc->postCode .= $CMparts[2];
+        $CMparts = $this->module->getContextMenuCode();
+        $this->module->JScode .= $CMparts[0];
+        $this->module->bodyTagAdditions = $CMparts[1];
+        $this->module->postCode .= $CMparts[2];
 
-        $this->content .= $this->doc->startPage($GLOBALS['LANG']->getLL("title"));
-        $this->content .= $this->doc->header($GLOBALS['LANG']->getLL("title"));
-        $this->content .= $this->doc->spacer(5);
+        $this->content .= $this->module->startPage($GLOBALS['LANG']->getLL("title"));
+        $this->content .= $this->module->header($GLOBALS['LANG']->getLL("title"));
+        $this->content .= $this->module->spacer(5);
 
         // Render content:
         $this->moduleContent();
 
         // ShortCut
         if ($GLOBALS['BE_USER']->mayMakeShortcut()) {
-            $this->content .= $this->doc->spacer(20) . $this->doc->section("",
-                    $this->doc->makeShortcutIcon("id", implode(",", array_keys($this->MOD_MENU)),
+            $this->content .= $this->module->spacer(20) . $this->module->section("",
+                    $this->module->makeShortcutIcon("id", implode(",", array_keys($this->MOD_MENU)),
                         $this->MCONF["name"]));
         }
 
-        $this->content .= $this->doc->spacer(10);
+        $this->content .= $this->module->spacer(10);
     }
 
     /**
@@ -133,9 +139,9 @@ class Module2List extends BaseScriptClass
             }
         }
 
-        $content .= '<table border="0" cellpadding="4" cellspacing="2">' . implode('', $tRows) . '</table>';
+        $content = '<table border="0" cellpadding="4" cellspacing="2">' . implode('', $tRows) . '</table>';
 
-        $this->content .= $this->doc->section("Priority list:", $content, 0, 1);
+        $this->content .= $this->module->section("Priority list:", $content, 0, 1);
     }
 
     function languageRows($languageList, $elementList)
@@ -167,13 +173,13 @@ class Module2List extends BaseScriptClass
 
             foreach ($elements as $el) {
                 $cells = '';
-				$rec_on = array();
+                $rec_on = array();
                 // Get CURRENT online record and icon based on "t3ver_oid":
-	            if ($el[0] !== '' && $el[1] > 0) {
-		            $rec_on = BackendUtility::getRecord($el[0], $el[1]);
-	            }
+                if ($el[0] !== '' && $el[1] > 0) {
+                    $rec_on = BackendUtility::getRecord($el[0], $el[1]);
+                }
                 $icon = IconUtility::getSpriteIconForRecord($el[0], $rec_on);
-                $icon = $this->doc->wrapClickMenuOnIcon($icon, $el[0], $rec_on['uid'], 2);
+                $icon = $this->module->wrapClickMenuOnIcon($icon, $el[0], $rec_on['uid'], 2);
 
                 $linkToIt = '<a href="#" onclick="' . htmlspecialchars('parent.list_frame.location.href="' . $GLOBALS['BACK_PATH'] . ExtensionManagementUtility::extRelPath('l10nmgr') . 'cm2/index.php?table=' . $el[0] . '&uid=' . $el[1] . '"; return false;') . '" target="listframe">
 					' . BackendUtility::getRecordTitle($el[0], $rec_on, true) . '
@@ -241,16 +247,8 @@ class Module2List extends BaseScriptClass
     function printContent()
     {
 
-        $this->content .= $this->doc->endPage();
+        $this->content .= $this->module->endPage();
         echo $this->content;
     }
 }
-
-// Make instance:
-$SOBE = GeneralUtility::makeInstance(Module2List::class);
-$SOBE->init();
-
-$SOBE->main();
-$SOBE->printContent();
-
 ?>

@@ -1,26 +1,21 @@
 <?php
-namespace Localizationteam\L10nmgr\Controller\Cm2;
+namespace Localizationteam\L10nmgr\Controller;
 
 /***************************************************************
  *  Copyright notice
- *
  *  (c) 2007 Kasper Skårhøj <kasperYYYY@typo3.com>
  *  All rights reserved
- *
  *  This script is part of the TYPO3 project. The TYPO3 project is
  *  free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
- *
  *  The GNU General Public License can be found at
  *  http://www.gnu.org/copyleft/gpl.html.
- *
  *  This script is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 /**
@@ -30,9 +25,6 @@ namespace Localizationteam\L10nmgr\Controller\Cm2;
  */
 /**
  * [CLASS/FUNCTION INDEX of SCRIPT]
- *
- *
- *
  *   65: class tx_l10nmgr_cm2 extends t3lib_SCbase
  *   72:     function menuConfig()
  *   83:     function main()
@@ -40,10 +32,9 @@ namespace Localizationteam\L10nmgr\Controller\Cm2;
  *  119:     function printContent()
  *  132:     function moduleContent($table,$uid)
  *  199:     function makeTableRow($rec)
- *
  * TOTAL FUNCTIONS: 6
  * (This index is automatically created/updated by the extension "extdeveval")
- *
+
  */
 
 // DEFAULT initialization of a module [BEGIN]
@@ -53,7 +44,6 @@ require($BACK_PATH . 'init.php');
 $LANG->includeLLFile('EXT:l10nmgr/cm2/locallang.xml');
 use TYPO3\CMS\Backend\Template\DocumentTemplate;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Localizationteam\L10nmgr\Model\Tools\Tools;
 
 /**
  * Translation management tool
@@ -62,8 +52,18 @@ use Localizationteam\L10nmgr\Model\Tools\Tools;
  * @package    TYPO3
  * @subpackage tx_l10nmgr
  */
-class Cm2 extends \TYPO3\CMS\Backend\Module\BaseScriptClass
+class Cm2 extends BaseScriptClass
 {
+
+    /**
+     * main action to be registered in ext_tables.php
+     */
+    public function mainAction()
+    {
+        $this->init();
+        $this->main();
+        $this->printContent();
+    }
 
     /**
      * Adds items to the ->MOD_MENU array. Used for the function menu selector.
@@ -87,12 +87,12 @@ class Cm2 extends \TYPO3\CMS\Backend\Module\BaseScriptClass
         global $BE_USER, $LANG, $BACK_PATH, $TCA_DESCR, $TCA, $CLIENT, $TYPO3_CONF_VARS;
 
         // Draw the header.
-        $this->doc = GeneralUtility::makeInstance(DocumentTemplate::class);
-        $this->doc->backPath = $BACK_PATH;
-        $this->doc->form = '<form action="" method="post" enctype="multipart/form-data">';
+        $this->module = GeneralUtility::makeInstance(DocumentTemplate::class);
+        $this->module->backPath = $BACK_PATH;
+        $this->module->form = '<form action="" method="post" enctype="multipart/form-data">';
 
         // JavaScript
-        $this->doc->JScode = '
+        $this->module->JScode = '
 			<script language="javascript" type="text/javascript">
 				script_ended = 0;
 				function jumpToUrl(URL)	{
@@ -102,17 +102,16 @@ class Cm2 extends \TYPO3\CMS\Backend\Module\BaseScriptClass
 		';
 
         // Header:
-        $this->content .= $this->doc->startPage($LANG->getLL('title'));
-        $this->content .= $this->doc->header($LANG->getLL('title'));
+        $this->content .= $this->module->startPage($LANG->getLL('title'));
+        $this->content .= $this->module->header($LANG->getLL('title'));
 
-        $this->content .= $this->doc->divider(5);
+        $this->content .= $this->module->divider(5);
 
         // Render the module content (for all modes):
-        $this->content .= $this->doc->section('',
-            $this->moduleContent((string)GeneralUtility::_GP('table'),
-                (int)GeneralUtility::_GP('uid')));
+        $this->content .= $this->module->section('',
+            $this->moduleContent((string)GeneralUtility::_GP('table'), (int)GeneralUtility::_GP('uid')));
 
-        $this->content .= $this->doc->spacer(10);
+        $this->content .= $this->module->spacer(10);
     }
 
     /**
@@ -120,6 +119,7 @@ class Cm2 extends \TYPO3\CMS\Backend\Module\BaseScriptClass
      *
      * @param   [type]    $table: ...
      * @param   [type]    $uid: ...
+     *
      * @return  [type]    ...
      */
     function moduleContent($table, $uid)
@@ -157,28 +157,14 @@ class Cm2 extends \TYPO3\CMS\Backend\Module\BaseScriptClass
 
             // Fetch translation index records:
             if ($table != 'pages') {
-                $records = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
-                    '*',
-                    'tx_l10nmgr_index',
-                    'tablename=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($table, 'tx_l10nmgr_index') .
-                    ' AND recuid=' . (int)$uid .
-                    ' AND translation_lang IN (' . $GLOBALS['TYPO3_DB']->cleanIntList($languageList) . ')' .
-                    ' AND workspace=' . (int)$GLOBALS['BE_USER']->workspace .
-                    ' AND (flag_new>0 OR flag_update>0 OR flag_noChange>0 OR flag_unknown>0)',
-                    '',
-                    'translation_lang, tablename, recuid'
-                );
+                $records = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('*', 'tx_l10nmgr_index',
+                    'tablename=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($table,
+                        'tx_l10nmgr_index') . ' AND recuid=' . (int)$uid . ' AND translation_lang IN (' . $GLOBALS['TYPO3_DB']->cleanIntList($languageList) . ')' . ' AND workspace=' . (int)$GLOBALS['BE_USER']->workspace . ' AND (flag_new>0 OR flag_update>0 OR flag_noChange>0 OR flag_unknown>0)',
+                    '', 'translation_lang, tablename, recuid');
             } else {
-                $records = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
-                    '*',
-                    'tx_l10nmgr_index',
-                    'recpid=' . (int)$uid .
-                    ' AND translation_lang IN (' . $GLOBALS['TYPO3_DB']->cleanIntList($languageList) . ')' .
-                    ' AND workspace=' . (int)$GLOBALS['BE_USER']->workspace .
-                    ' AND (flag_new>0 OR flag_update>0 OR flag_noChange>0 OR flag_unknown>0)',
-                    '',
-                    'translation_lang, tablename, recuid'
-                );
+                $records = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('*', 'tx_l10nmgr_index',
+                    'recpid=' . (int)$uid . ' AND translation_lang IN (' . $GLOBALS['TYPO3_DB']->cleanIntList($languageList) . ')' . ' AND workspace=' . (int)$GLOBALS['BE_USER']->workspace . ' AND (flag_new>0 OR flag_update>0 OR flag_noChange>0 OR flag_unknown>0)',
+                    '', 'translation_lang, tablename, recuid');
             }
 
             #	\TYPO3\CMS\Core\Utility\GeneralUtility::debugRows($records,'Index entries for '.$table.':'.$uid);
@@ -230,6 +216,7 @@ class Cm2 extends \TYPO3\CMS\Backend\Module\BaseScriptClass
      * [Describe function...]
      *
      * @param   [type]    $rec: ...
+     *
      * @return  [type]    ...
      */
     function makeTableRow($rec)
@@ -242,17 +229,18 @@ class Cm2 extends \TYPO3\CMS\Backend\Module\BaseScriptClass
         $baseRecordFlag = '<img src="' . htmlspecialchars($GLOBALS['BACK_PATH'] . $this->sysLanguages[$rec['sys_language_uid']]['flagIcon']) . '" alt="" title="" />';
         $tFlag = '<img src="' . htmlspecialchars($GLOBALS['BACK_PATH'] . $this->sysLanguages[$rec['translation_lang']]['flagIcon']) . '" alt="' . htmlspecialchars($this->sysLanguages[$rec['translation_lang']]['title']) . '" title="' . htmlspecialchars($this->sysLanguages[$rec['translation_lang']]['title']) . '" />';
         $baseRecordStr = '<a href="#" onclick="' . htmlspecialchars(t3lib_BEfunc::editOnClick('&edit[' . $rec['tablename'] . '][' . $rec['recuid'] . ']=edit',
-                $this->doc->backPath)) . '">' . $icon . $title . '</a>';
+                $this->module->backPath)) . '">' . $icon . $title . '</a>';
 
         // Render for translation if any:
         $translationRecord = false;
         if ($rec['translation_recuid']) {
             $translationTable = $this->l10nMgrTools->t8Tools->getTranslationTable($rec['tablename']);
             $translationRecord = t3lib_BEfunc::getRecordWSOL($translationTable, $rec['translation_recuid']);
-            $icon = \TYPO3\CMS\Backend\Utility\IconUtility::getSpriteIconForRecord($translationTable, $translationRecord);
+            $icon = \TYPO3\CMS\Backend\Utility\IconUtility::getSpriteIconForRecord($translationTable,
+                $translationRecord);
             $title = t3lib_BEfunc::getRecordTitle($translationTable, $translationRecord, 1);
             $translationRecStr = '<a href="#" onclick="' . htmlspecialchars(t3lib_BEfunc::editOnClick('&edit[' . $translationTable . '][' . $translationRecord['uid'] . ']=edit',
-                    $this->doc->backPath)) . '">' . $icon . $title . '</a>';
+                    $this->module->backPath)) . '">' . $icon . $title . '</a>';
         } else {
             $translationRecStr = '';
         }
@@ -260,14 +248,12 @@ class Cm2 extends \TYPO3\CMS\Backend\Module\BaseScriptClass
         // Action:
         if (is_array($translationRecord)) {
             $action = '<a href="#" onclick="' . htmlspecialchars(t3lib_BEfunc::editOnClick('&edit[' . $translationTable . '][' . $translationRecord['uid'] . ']=edit',
-                    $this->doc->backPath)) . '"><em>[Edit]</em></a>';
+                    $this->module->backPath)) . '"><em>[Edit]</em></a>';
         } elseif ($rec['sys_language_uid'] == -1) {
             $action = '<a href="#" onclick="' . htmlspecialchars(t3lib_BEfunc::editOnClick('&edit[' . $rec['tablename'] . '][' . $rec['recuid'] . ']=edit',
-                    $this->doc->backPath)) . '"><em>[Edit]</em></a>';
+                    $this->module->backPath)) . '"><em>[Edit]</em></a>';
         } else {
-            $action = '<a href="' . htmlspecialchars($this->doc->issueCommand(
-                    '&cmd[' . $rec['tablename'] . '][' . $rec['recuid'] . '][localize]=' . $rec['translation_lang']
-                )) . '"><em>[Localize]</em></a>';
+            $action = '<a href="' . htmlspecialchars($this->module->issueCommand('&cmd[' . $rec['tablename'] . '][' . $rec['recuid'] . '][localize]=' . $rec['translation_lang'])) . '"><em>[Localize]</em></a>';
         }
 
         return '<tr class="bgColor4-20">
@@ -292,14 +278,8 @@ class Cm2 extends \TYPO3\CMS\Backend\Module\BaseScriptClass
     function printContent()
     {
 
-        $this->content .= $this->doc->endPage();
+        $this->content .= $this->module->endPage();
         echo $this->content;
     }
 }
-
-// Make instance:
-$SOBE = GeneralUtility::makeInstance(Cm2::class);
-$SOBE->init();
-$SOBE->main();
-$SOBE->printContent();
 ?>

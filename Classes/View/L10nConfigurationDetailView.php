@@ -1,28 +1,23 @@
 <?php
 namespace Localizationteam\L10nmgr\View;
 
-/***************************************************************
- *  Copyright notice
- *
- *  (c) 2006 Kasper Skårhøj <kasperYYYY@typo3.com>
- *  All rights reserved
- *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- ***************************************************************/
+    /***************************************************************
+     *  Copyright notice
+     *  (c) 2006 Kasper Skårhøj <kasperYYYY@typo3.com>
+     *  All rights reserved
+     *  This script is part of the TYPO3 project. The TYPO3 project is
+     *  free software; you can redistribute it and/or modify
+     *  it under the terms of the GNU General Public License as published by
+     *  the Free Software Foundation; either version 2 of the License, or
+     *  (at your option) any later version.
+     *  The GNU General Public License can be found at
+     *  http://www.gnu.org/copyleft/gpl.html.
+     *  This script is distributed in the hope that it will be useful,
+     *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+     *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     *  GNU General Public License for more details.
+     *  This copyright notice MUST APPEAR in all copies of the script!
+     ***************************************************************/
 
 /**
  * l10nmgr detail view:
@@ -30,7 +25,6 @@ namespace Localizationteam\L10nmgr\View;
  *
  * @author  Kasper Skaarhoj <kasperYYYY@typo3.com>
  * @author  Daniel Pötzinger <development@aoemedia.de>
- *
  * @package TYPO3
  * @subpackage tx_l10nmgr
  */
@@ -43,20 +37,20 @@ class L10nConfigurationDetailView
     var $l10ncfgObj; // Internal array (=datarow of config record)
 
     /**
-     * @var $doc
+     * @var $module
      */
-    var $doc = null;
+    var $module = null;
 
-	/**
-	 * constructor. Set the internal required objects as parameter in constructor (kind of dependency injection, and communicate the dependencies)
-	 *
-	 * @param L10nConfiguration $l10ncfgObj
-	 * @param DocumentTemplate $doc Reference to the calling template object
-	 */
-    function __construct($l10ncfgObj, $doc)
+    /**
+     * constructor. Set the internal required objects as parameter in constructor (kind of dependency injection, and communicate the dependencies)
+     *
+     * @param L10nConfiguration $l10ncfgObj
+     * @param DocumentTemplate $module Reference to the calling template object
+     */
+    function __construct($l10ncfgObj, $module)
     {
         $this->l10ncfgObj = $l10ncfgObj;
-        $this->doc = $doc;
+        $this->module = $module;
     }
 
     /**
@@ -75,25 +69,25 @@ class L10nConfigurationDetailView
         }
 
         $configurationSettings = '
-				<table border="0" cellpadding="0" cellspacing="0" class="typo3-dblist">
+				<table class="table table-striped table-hover">
 					<tr class="t3-row-header">
-						<td colspan="4"><strong>' . htmlspecialchars($this->l10ncfgObj->getData('title')) . ' [' . $this->l10ncfgObj->getData('uid') . ']</strong></td>
+						<th colspan="4">' . htmlspecialchars($this->l10ncfgObj->getData('title')) . ' [' . $this->l10ncfgObj->getData('uid') . ']</th>
 					</tr>
 					<tr class="db_list_normal">
-						<td><strong>' . $LANG->getLL('general.list.headline.depth.title') . ':</strong></td>
+						<th>' . $LANG->getLL('general.list.headline.depth.title') . ':</h>
 						<td>' . htmlspecialchars($this->l10ncfgObj->getData('depth')) . '&nbsp;</td>
-						<td><strong>' . $LANG->getLL('general.list.headline.tables') . ':</strong></td>
+						<th>' . $LANG->getLL('general.list.headline.tables') . ':</th>
 						<td>' . htmlspecialchars($this->l10ncfgObj->getData('tablelist')) . '&nbsp;</td>
 					</tr>
 					<tr class="db_list_normal">
-						<td><strong>' . $LANG->getLL('general.list.headline.exclude.title') . ':</strong></td>
+						<th>' . $LANG->getLL('general.list.headline.exclude.title') . ':</th>
 						<td>' . htmlspecialchars($this->l10ncfgObj->getData('exclude')) . '&nbsp;</td>
-						<td><strong>' . $LANG->getLL('general.list.headline.include.title') . ':</strong></td>
+						<th>' . $LANG->getLL('general.list.headline.include.title') . ':</th>
 						<td>' . htmlspecialchars($this->l10ncfgObj->getData('include')) . '&nbsp;</td>
 					</tr>
 				</table>';
 
-        $content .= $this->doc->section($LANG->getLL('general.export.configuration.title'), $configurationSettings);
+        $content .= $this->module->section($LANG->getLL('general.export.configuration.title'), $configurationSettings);
 
         return $content;
     }

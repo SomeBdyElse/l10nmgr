@@ -1,96 +1,96 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <xliff version="1.0">
-	<file source-language="en" target-language="fr" datatype="plaintext" original="messages" date="2015-07-30T00:29:38Z" product-name="l10nmgr">
+	<file source-language="en" target-language="de" datatype="plaintext" original="messages" date="2015-07-30T00:29:38Z" product-name="l10nmgr">
 		<header/>
 		<body>
 			<trans-unit id="general.action.refresh.button.title" xml:space="preserve" approved="yes">
 				<source>Refresh</source>
-				<target>Actualiser</target>
+				<target>Aktualisieren</target>
 			</trans-unit>
 			<trans-unit id="general.action.save.button.title" xml:space="preserve" approved="yes">
 				<source>Save</source>
-				<target>Enregistrer</target>
+				<target>Speichern</target>
 			</trans-unit>
 			<trans-unit id="general.action.cancel.button.title" xml:space="preserve" approved="yes">
 				<source>Cancel</source>
-				<target>Annuler</target>
+				<target>Abbrechen</target>
 			</trans-unit>
 			<trans-unit id="general.action.blank.title" xml:space="preserve" approved="yes">
 				<source>--Select Action--</source>
-				<target>--Sélectionner action--</target>
+				<target>--Aktion auswählen--</target>
 			</trans-unit>
 			<trans-unit id="general.action.edit.link.title" xml:space="preserve" approved="yes">
 				<source>Overview with links</source>
-				<target>Vue d'ensemble avec liens</target>
+				<target>Übersicht mit Links</target>
 			</trans-unit>
 			<trans-unit id="general.action.edit.inline.title" xml:space="preserve" approved="yes">
 				<source>Online translation</source>
-				<target>Traduction en ligne</target>
+				<target>Online-Übersetzung</target>
 			</trans-unit>
 			<trans-unit id="general.action.export.excel.title" xml:space="preserve" approved="yes">
 				<source>Excel export/import</source>
-				<target>Exportation/Importation Excel</target>
+				<target>Excel-Export/Import</target>
 			</trans-unit>
 			<trans-unit id="general.action.export.xml.title" xml:space="preserve" approved="yes">
 				<source>XML export/import</source>
-				<target>Exportation/Importation XML</target>
+				<target>XML-Export/Import</target>
 			</trans-unit>
 			<trans-unit id="general.action.export.xml.button.title" xml:space="preserve" approved="yes">
 				<source>Export</source>
-				<target>Exporter</target>
+				<target>Export</target>
 			</trans-unit>
 			<trans-unit id="general.action.import.xml.button.title" xml:space="preserve" approved="yes">
 				<source>Import</source>
-				<target>Importer</target>
+				<target>Import</target>
 			</trans-unit>
 			<trans-unit id="general.access.error.title" xml:space="preserve" approved="yes">
 				<source>ERROR: User has no access to edit any translations!</source>
-				<target>ERREUR: Utilisateur n'a pas d'accès pour éditer cette langue!
+				<target>FEHLER: Benutzer hat keinen Zugriff auf diese Sprachversion!
 			</target>
 			</trans-unit>
-			<trans-unit id="general.title" xml:space="preserve" approved="yes">
+			<trans-unit id="export.import.title" xml:space="preserve" approved="yes">
 				<source>L10N Export/Import</source>
-				<target>L10N Exportation/Importation</target>
+				<target>L10N-Export/Import</target>
 			</trans-unit>
 			<trans-unit id="general.export.configuration.title" xml:space="preserve" approved="yes">
 				<source>Configuration of translation object:</source>
-				<target>Configuration de l'objet de traduction:</target>
+				<target>Konfiguration des Übersetzungsobjektes:</target>
 			</trans-unit>
 			<trans-unit id="general.export.configuration.error.title" xml:space="preserve" approved="yes">
 				<source>ERROR: No valid l10nmgr config!</source>
-				<target>ERREUR: Configuration l10nmgr non valide!</target>
+				<target>FEHLER: Keine gültige l10nmgr-Konfiguration!</target>
 			</trans-unit>
 			<trans-unit id="general.export.choose.action.title" xml:space="preserve" approved="yes">
 				<source>Choose your action</source>
-				<target>Que voulez-vous faire?</target>
+				<target>Was möchten Sie tun?</target>
 			</trans-unit>
 			<trans-unit id="general.list.headline.depth.title" xml:space="preserve" approved="yes">
 				<source>Depth</source>
-				<target>Profondeur</target>
+				<target>Ebenen</target>
 			</trans-unit>
 			<trans-unit id="general.list.headline.tables" xml:space="preserve" approved="yes">
 				<source>Tables</source>
-				<target>Tableaux</target>
+				<target>Tabellen</target>
 			</trans-unit>
 			<trans-unit id="general.list.headline.exclude.title" xml:space="preserve" approved="yes">
 				<source>Exclude</source>
-				<target>Exclure</target>
+				<target>Ausschließen</target>
 			</trans-unit>
 			<trans-unit id="general.list.headline.include.title" xml:space="preserve" approved="yes">
 				<source>Include</source>
-				<target>Inclure</target>
+				<target>Einschließen</target>
 			</trans-unit>
 			<trans-unit id="general.list.headline.incfcewithdefaultlanguage.title" xml:space="preserve" approved="yes">
 				<source>Default FCE</source>
-				<target></target>
+				<target>Default FCE</target>
 			</trans-unit>
 			<trans-unit id="file.settings.downloads.title" xml:space="preserve" approved="yes">
 				<source>Download settings files</source>
-				<target>Télécharger fichiers avec paramètres des balises:</target>
+				<target>Einstellungsdateien herunterladen:</target>
 			</trans-unit>
 			<trans-unit id="file.settings.available.title" xml:space="preserve" approved="yes">
 				<source>Available settings files:</source>
-				<target>Fichiers avec paramètres des balises disponibles:</target>
+				<target>Verfügbare Einstellungsdateien:</target>
 			</trans-unit>
 			<trans-unit id="file.settings.across.title" xml:space="preserve" approved="yes">
 				<source>across (.dst)</source>
@@ -130,54 +130,54 @@
 			</trans-unit>
 			<trans-unit id="file.settings.download.title" xml:space="preserve" approved="yes">
 				<source>Download settings file</source>
-				<target>Télécharger fichier avec paramètres des balises</target>
+				<target>Einstellungsdatei herunterladen</target>
 			</trans-unit>
 			<trans-unit id="inlineedit.save.alert.title" xml:space="preserve" approved="yes">
 				<source>You are about to create/update ALL localizations in this form?
 				Continue?
 			</source>
-				<target>Vous êtes en train de créer/actualiser TOUTES les traductions
-				dans ce formulaire! Souhaitez-vous continuer?
+				<target>Sie sind dabei, ALLE Übersetzungen in diesem Formular zu
+				erstellen/aktualisieren! Möchten Sie fortfahren?
 			</target>
 			</trans-unit>
 			<trans-unit id="inlineedit.cancel.alert.title" xml:space="preserve" approved="yes">
 				<source>You are about to discard any changes you made. Continue?
 			</source>
-				<target>Vous êtes en train d'annuler tous les changements.
-				Souhaitez-vous continuer?
+				<target>Sie sind dabei, alle Änderungen zu verwerfen. Möchten Sie
+				fortfahren?
 			</target>
 			</trans-unit>
 			<trans-unit id="export.xml.headline.title" xml:space="preserve" approved="yes">
 				<source>Export</source>
-				<target>Exportation:</target>
+				<target>Export</target>
 			</trans-unit>
 			<trans-unit id="export.xml.source-language.title" xml:space="preserve" approved="yes">
 				<source>Alternative source language:</source>
-				<target>Forcer langue source:</target>
+				<target>Ausgangssprache erzwingen:</target>
 			</trans-unit>
 			<trans-unit id="export.xml.new.title" xml:space="preserve" approved="yes">
 				<source>New/Changed content only</source>
-				<target>Traduire seulement contenus nouveaux/changés</target>
+				<target>Nur neue/geänderte Inhalte übersetzen</target>
 			</trans-unit>
 			<trans-unit id="export.xml.noHidden.title" xml:space="preserve" approved="yes">
 				<source>No hidden content</source>
-				<target>Exclure contenus cachés</target>
+				<target>Keine versteckten Inhalte</target>
 			</trans-unit>
 			<trans-unit id="export.xml.check_exports.title" xml:space="preserve" approved="yes">
 				<source>Check for already exported content</source>
-				<target>Vérification pour contenus déjà exportés</target>
+				<target>Überprüfung auf bereits exportierte Inhalte</target>
 			</trans-unit>
 			<trans-unit id="export.xml.no_check_xml.title" xml:space="preserve" approved="yes">
 				<source>Do not check XML</source>
-				<target>Ne pas vérifier le format XML</target>
+				<target>Überspringe XML-Überprüfung</target>
 			</trans-unit>
 			<trans-unit id="export.xml.checkXml.title" xml:space="preserve" approved="yes">
 				<source>Check XML</source>
-				<target>Vérification du code XML</target>
+				<target>Prüfe XML</target>
 			</trans-unit>
 			<trans-unit id="export.xml.checkUtf8.title" xml:space="preserve" approved="yes">
 				<source>Check UTF-8</source>
-				<target>Vérification du codage (UTF-8)</target>
+				<target>Prüfe UTF-8</target>
 			</trans-unit>
 			<trans-unit id="export.xml.ftp.title" xml:space="preserve" approved="yes">
 				<source>Send to FTP server</source>
@@ -185,41 +185,39 @@
 			</trans-unit>
 			<trans-unit id="export.process.error.empty.message" xml:space="preserve" approved="yes">
 				<source>Empty element</source>
-				<target>Elément vide</target>
+				<target>Leeres Element</target>
 			</trans-unit>
 			<trans-unit id="export.process.error.invalid.message" xml:space="preserve" approved="yes">
 				<source>Detected invalid characters in element</source>
-				<target>Caractère invalide dans l'élément</target>
+				<target>Ungültige Zeichen in Element entdeckt</target>
 			</trans-unit>
 			<trans-unit id="export.process.duplicate.title" xml:space="preserve" approved="yes">
 				<source>Contents are already exported for translation!</source>
-				<target>Les contenus ont déjà été (partiellement) exportés pour la
-				traduction!
-			</target>
+				<target>Inhalte wurden schon für Übersetzung exportiert!</target>
 			</trans-unit>
 			<trans-unit id="export.process.duplicate.message" xml:space="preserve" approved="yes">
 				<source>Please select one of the listed exports below.</source>
-				<target></target>
+				<target>Bitte wählen Sie einen der existierenden Exporte.</target>
 			</trans-unit>
 			<trans-unit id="export.overview.date.label" xml:space="preserve" approved="yes">
 				<source>Date</source>
-				<target>Date</target>
+				<target>Datum</target>
 			</trans-unit>
 			<trans-unit id="export.overview.configuration.label" xml:space="preserve" approved="yes">
 				<source>Configuration</source>
-				<target>Configuration</target>
+				<target>Konfiguration</target>
 			</trans-unit>
 			<trans-unit id="export.overview.type.label" xml:space="preserve" approved="yes">
 				<source>Type</source>
-				<target>Type</target>
+				<target>Typ</target>
 			</trans-unit>
 			<trans-unit id="export.overview.targetlanguage.label" xml:space="preserve" approved="yes">
 				<source>Target language</source>
-				<target>Langue cible</target>
+				<target>Zielsprache</target>
 			</trans-unit>
 			<trans-unit id="export.overview.filename.label" xml:space="preserve" approved="yes">
 				<source>Filename</source>
-				<target>Nom du fichier</target>
+				<target>Dateiname</target>
 			</trans-unit>
 			<trans-unit id="export.download.error" xml:space="preserve" approved="yes">
 				<source>Export failed</source>
@@ -263,18 +261,18 @@
 			</trans-unit>
 			<trans-unit id="import.xml.headline.title" xml:space="preserve" approved="yes">
 				<source>Import</source>
-				<target>Importation:</target>
+				<target>Import</target>
 			</trans-unit>
 			<trans-unit id="import.xml.old-format.title" xml:space="preserve" approved="yes">
 				<source>Import old format (v2)</source>
-				<target>Importer ancienne format (v2)</target>
+				<target>Altes Format importieren (v2)</target>
 			</trans-unit>
 			<trans-unit id="import.xml.old-format.message" xml:space="preserve" approved="yes">
 				<source>Import uses the old format without pageGrp element and
 				checks!
 			</source>
-				<target>Importation du format sans elements pageGrp et sans
-				vérifications!
+				<target>Import verwendet Format ohne pageGrp-Elemente und
+				Prüfmechanismen!
 			</target>
 			</trans-unit>
 			<trans-unit id="import.xml.asdefaultlanguage.title" xml:space="preserve" approved="yes">
@@ -289,7 +287,7 @@
 			</trans-unit>
 			<trans-unit id="import.xml.delL10N.title" xml:space="preserve" approved="yes">
 				<source>Delete localizations before import</source>
-				<target>Supprimer localisations avant l'importation</target>
+				<target>Lösche Lokalisierungen vor Import</target>
 			</trans-unit>
 			<trans-unit id="import.xml.make_preview_link.title" xml:space="preserve" approved="yes">
 				<source>Generate preview links</source>
@@ -311,17 +309,16 @@
 				<source>Previous localizations will be deleted before importing new
 				ones!
 			</source>
-				<target>Le traductions précédentes seront supprimées avant
-				l'importation!
+				<target>Vorherige Übersetzungen werden vor dem Import neuer gelöscht!
 			</target>
 			</trans-unit>
 			<trans-unit id="import.error.title" xml:space="preserve" approved="yes">
 				<source>Error in Import:</source>
-				<target>Erreurs d'import:</target>
+				<target>Fehler beim Import:</target>
 			</trans-unit>
 			<trans-unit id="import.success.message" xml:space="preserve" approved="yes">
 				<source>Import done!</source>
-				<target>Importation réussie!</target>
+				<target>Import erfolgreich!</target>
 			</trans-unit>
 			<trans-unit id="import.manager.error.parsing.xmlstring.message" xml:space="preserve" approved="yes">
 				<source>Error parsing XML string</source>
@@ -329,58 +326,57 @@
 			</trans-unit>
 			<trans-unit id="import.manager.error.parsing.xml2tree.message" xml:space="preserve" approved="yes">
 				<source>XML2Tree parsing error:</source>
-				<target>Erreur de XML2Tree:</target>
+				<target>XML2Tree-Parsing-Fehler:</target>
 			</trans-unit>
 			<trans-unit id="import.manager.error.missing.meta.message" xml:space="preserve" approved="yes">
 				<source>Could not find meta data in XML!</source>
-				<target>Métadonnées non trouvées dans l'XML!</target>
+				<target>Keine Metadaten in XML gefunden!</target>
 			</trans-unit>
 			<trans-unit id="import.manager.error.version.message" xml:space="preserve" approved="yes">
 				<source>Incorrect Version of the format: %s (required: %s)
 			</source>
-				<target>La version du format est incorrecte: %s (requise: %s)
-			</target>
+				<target>Falsche Formatversion: %s (erforderlich: %s)</target>
 			</trans-unit>
 			<trans-unit id="import.manager.error.workspace.message" xml:space="preserve" approved="yes">
 				<source>Export was taken from a diffrent Workspace, please
 				import in this workspace to avoid problems: Current %s (required: %s)
 			</source>
-				<target>L'export provient d'un autre espace de travail. S'il
-				vous plaît, importez dans l'espace de trouvail d'où provient l'export pour éviter d'éventuels problèmes.
-				Espace de travail actuel: %s (Requis: %s)
+				<target>Export stammt aus einer anderen Workspace. Bitte
+				importieren Sie in die Workspace, aus der der Export stammt, um Probleme zu vermeiden. Aktuelle
+				Workspace: %s (Erfordeliche: %s)
 			</target>
 			</trans-unit>
 			<trans-unit id="import.manager.error.language.message" xml:space="preserve" approved="yes">
 				<source>'Export was taken from a diffrent language, please
 				select correct language above! current: %s (required: %s)
 			</source>
-				<target>'L'export contient une autre langue. S'il vous plaît,
-				choisissez la langue correcte de la liste ci-dessus! Langue actuel: %s (Requise: %s)
+				<target>'Export beinhaltet eine andere Sprache. Bitte wählen
+				Sie die korrekte Sprache aus der obigen Liste aus! Aktuelle Sprache: %s (Erforderlich: %s)
 			</target>
 			</trans-unit>
 			<trans-unit id="misc.messages.title" xml:space="preserve" approved="yes">
 				<source>Messages:</source>
-				<target>Messages:</target>
+				<target>Meldungen:</target>
 			</trans-unit>
 			<trans-unit id="render_overview.nochange.message" xml:space="preserve" approved="yes">
 				<source>No change.</source>
-				<target>Pas de changement.</target>
+				<target>Keine Änderung.</target>
 			</trans-unit>
 			<trans-unit id="render_overview.new.message" xml:space="preserve" approved="yes">
 				<source>NEW</source>
-				<target>NOUVEAU</target>
+				<target>NEU</target>
 			</trans-unit>
 			<trans-unit id="render_overview.nodiff.message" xml:space="preserve" approved="yes">
 				<source>No diff available.</source>
-				<target>Aucun Diff disponible.</target>
+				<target>Kein Diff verfügbar.</target>
 			</trans-unit>
 			<trans-unit id="render_overview.clickedit.message" xml:space="preserve" approved="yes">
 				<source>Click to edit</source>
-				<target>Cliquez pour modifier</target>
+				<target>Zum Editieren hier klicken</target>
 			</trans-unit>
 			<trans-unit id="render_overview.clicklocalize.message" xml:space="preserve" approved="yes">
 				<source>Click to localize</source>
-				<target>Cliquez pour traduire</target>
+				<target>Zum Lokalisieren hier klicken</target>
 			</trans-unit>
 			<trans-unit id="l10nmgr.documentation.title" xml:space="preserve" approved="yes">
 				<source>Documentation</source>
