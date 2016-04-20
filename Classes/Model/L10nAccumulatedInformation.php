@@ -20,6 +20,7 @@ namespace Localizationteam\L10nmgr\Model;
  ***************************************************************/
 
 use Localizationteam\L10nmgr\Model\Tools\InlineRelationTool;
+use Localizationteam\L10nmgr\Model\Tools\RelationTool;
 use Localizationteam\L10nmgr\Model\Tools\Tools;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -225,13 +226,64 @@ class L10nAccumulatedInformation
             }
         }
 
+        $flattened = $this->flattenAccumulatedRecords($accum);
+
+
+        /** @var RelationTool $relationTool */
+        $relationTool = GeneralUtility::makeInstance(RelationTool::class, $this->l10ncfg);
+        $relatedRecordsSignatures = $relationTool->getRelatedRecords($flattened, $this->l10ncfg);
+
+        foreach($relatedRecordsSignatures as $recordSignature) {
+            $uid = $recordSignature['uid'];
+            $table = $recordSignature['table'];
+
+            $row = BackendUtility::getRecord($table, $uid);
+            if(! is_null($row)) {
+                BackendUtility::workspaceOL($table, $row);
+
+                $pid = array_key_exists('pid', $row) ? $row['pid'] : 0;
+
+                if(! array_key_exists($pid, $accum)) {
+                    $accum[$pid] = [
+                        'header' => [
+                            'title' => 'Record Collection',
+                        ],
+                        'items' => [],
+                    ];
+                }
+                $accum[$pid]['items'][$table][$row['uid']] = $t8Tools->translationDetails($table, $row, $this->sysLang, $flexFormDiff);
+            }
+        }
+
+
         if($this->l10ncfg['nest_inline_records']) {
             /** @var InlineRelationTool $inlineRelationTool */
             $inlineRelationTool = GeneralUtility::makeInstance(InlineRelationTool::class, $this->l10ncfg);
-            $inlineRelationTool->addNestingInformation($accum);
+            $inlineRelationTool->addNestingInformation($flattened);
         }
 
         $this->_accumulatedInformations = $accum;
+    }
+
+    /**
+     * @param $accum
+     * @return array $table => $uid => $row
+     */
+    public function flattenAccumulatedRecords(& $accum)
+    {
+        $flattened = [];
+        foreach ($accum as &$pages) {
+            foreach ($pages['items'] as $table => &$records) {
+                foreach ($records as $uid => &$record) {
+                    if (!array_key_exists($table, $flattened)) {
+                        $flattened[$table] = [];
+                    }
+                    $flattened[$table][$uid] = &$record;
+                }
+            }
+        }
+
+        return $flattened;
     }
 
     function _increaseInternalCounters($fieldsArray)

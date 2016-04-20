@@ -22,10 +22,11 @@ class InlineRelationTool
     }
 
 
-    public function addNestingInformation(&$accum)
+    /**
+     * @param array $flattened flattened accumulated records (will be modified)
+     */
+    public function addNestingInformation(&$flattened)
     {
-        $flattened = $this->flattenAccumulatedRecords($accum);
-
         /** @var InlineRelation $inlineRelation */
         foreach($this->inlineRelations as $inlineRelation) {
             $parentTCAConf = $inlineRelation->parentTCAConf;
@@ -108,24 +109,4 @@ class InlineRelationTool
         return $inlineRelations;
     }
 
-    /**
-     * @param $accum
-     * @return array flattened records table -> uid -> record
-     */
-    protected function flattenAccumulatedRecords(& $accum)
-    {
-        $flattened = [];
-        foreach ($accum as &$pages) {
-            foreach ($pages['items'] as $table => &$records) {
-                foreach ($records as $uid => &$record) {
-                    if (!array_key_exists($table, $flattened)) {
-                        $flattened[$table] = [];
-                    }
-                    $flattened[$table][$uid] = &$record;
-                }
-            }
-        }
-
-        return $flattened;
-    }
 }
