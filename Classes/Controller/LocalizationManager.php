@@ -345,7 +345,6 @@ class LocalizationManager extends BaseScriptClass
                 break;
 
             case 'export_xml': // XML import/export
-                $prefs['utf8'] = GeneralUtility::_POST('check_utf8');
                 $prefs['noxmlcheck'] = GeneralUtility::_POST('no_check_xml');
                 $BE_USER->pushModuleData('l10nmgr/cm1/prefs', $prefs);
 
@@ -526,7 +525,6 @@ class LocalizationManager extends BaseScriptClass
     {
         global $BE_USER;
 
-
         /** @var $service L10nBaseService */
         $service = GeneralUtility::makeInstance(L10nBaseService::class);
 
@@ -590,9 +588,6 @@ class LocalizationManager extends BaseScriptClass
         }
         // If export of XML is asked for, do that (this will exit and push a file for download, or upload to FTP is option is checked)
         if (GeneralUtility::_POST('export_xml')) {
-            // Save user prefs
-            $BE_USER->pushModuleData('l10nmgr/cm1/checkUTF8', GeneralUtility::_POST('check_utf8'));
-
             // Render the XML
             /** @var $viewClass CatXmlView */
             $viewClass = GeneralUtility::makeInstance(CatXmlView::class, $l10ncfgObj, $this->sysLanguage);
@@ -686,9 +681,6 @@ class LocalizationManager extends BaseScriptClass
                 '<div class="form-group"><div class="checkbox"><label>' .
                     '<input type="checkbox" value="1" checked="checked" name="no_check_xml" /> ' . $GLOBALS['LANG']->getLL('export.xml.no_check_xml.title') .
                 '</label></div></div><br />' .
-                '<div class="form-group"><div class="checkbox"><label>' .
-                    '<input type="checkbox" value="1" name="check_utf8" /> ' . $GLOBALS['LANG']->getLL('export.xml.checkUtf8.title') .
-                '</label></div></div><br /><br />' .
             '</div><div class="form-section">' .
                 '<div class="form-group">' .
                 '<label>' . $GLOBALS['LANG']->getLL('export.xml.source-language.title') . '</label><br />' .

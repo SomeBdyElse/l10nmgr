@@ -176,10 +176,6 @@
 				<source>Check XML</source>
 				<target>Controllo di correttezza del formato XML</target>
 			</trans-unit>
-			<trans-unit id="export.xml.checkUtf8.title" xml:space="preserve" approved="yes">
-				<source>Check UTF-8</source>
-				<target>Controllo della codifica dei caratteri (UTF-8)</target>
-			</trans-unit>
 			<trans-unit id="export.xml.ftp.title" xml:space="preserve" approved="yes">
 				<source>Send to FTP server</source>
 				<target></target>

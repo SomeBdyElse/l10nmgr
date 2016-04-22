@@ -43,11 +43,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class CatXmlView extends AbstractExportView
 {
     /**
-     * @var XmlTools
-     */
-    protected $xmlTool;
-
-    /**
      * @var DOMTools
      */
     protected $domTool;
@@ -72,7 +67,6 @@ class CatXmlView extends AbstractExportView
 
     function __construct($l10ncfgObj, $sysLang)
     {
-        $this->xmlTool = GeneralUtility::makeInstance(XmlTools::class);
         $this->domTool = GeneralUtility::makeInstance(DOMTools::class);
         parent::__construct($l10ncfgObj, $sysLang);
     }

@@ -141,9 +141,6 @@
 			<trans-unit id="export.xml.checkXml.title" xml:space="preserve">
 				<source>Check XML</source>
 			</trans-unit>
-			<trans-unit id="export.xml.checkUtf8.title" xml:space="preserve">
-				<source>Check UTF-8</source>
-			</trans-unit>
 			<trans-unit id="export.xml.ftp.title" xml:space="preserve">
 				<source>Send to FTP server</source>
 			</trans-unit>
