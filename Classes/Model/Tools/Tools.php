@@ -568,7 +568,15 @@ class Tools
             $this->detailsOutput['log'][] = 'ERROR: ' . $tInfo;
         }
 
-        return $this->detailsOutput;
+        if(
+            array_key_exists('fields', $this->detailsOutput)
+            && is_array($this->detailsOutput['fields'])
+            && count($this->detailsOutput['fields'] > 0)
+        ) {
+            return $this->detailsOutput;
+        }
+
+        return null;
     }
 
     /**
