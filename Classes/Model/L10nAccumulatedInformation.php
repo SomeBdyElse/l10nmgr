@@ -264,15 +264,6 @@ class L10nAccumulatedInformation
 
                 $pid = array_key_exists('pid', $row) ? $row['pid'] : 0;
 
-                if(! array_key_exists($pid, $this->_accumulatedInformation)) {
-                    $this->_accumulatedInformation[$pid] = [
-                        'header' => [
-                            'title' => 'Record Collection',
-                        ],
-                        'items' => [],
-                    ];
-                }
-
                 $this->addRow($pid, $table, $row);
             }
         }
@@ -340,6 +331,16 @@ class L10nAccumulatedInformation
         );
 
         if(! is_null($translationDetails)) {
+            // create dummy page if needed
+            if(! array_key_exists($pageId, $this->_accumulatedInformation)) {
+                $this->_accumulatedInformation[$pageId] = [
+                    'header' => [
+                        'title' => 'Record Collection',
+                    ],
+                    'items' => [],
+                ];
+            }
+
             $this->_accumulatedInformation[$pageId]['items'][$table][$uid] = $translationDetails;
             $this->_increaseInternalCounters($translationDetails['fields']);
         }
