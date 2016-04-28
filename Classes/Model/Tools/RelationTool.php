@@ -81,31 +81,34 @@ class RelationTool
             $uid = $record['uid'];
 
             $row = BackendUtility::getRecord($table, $uid);
-            $relations = $this->referenceIndex->getRelations($table, $row);
+            if(is_array($row)) {
+                $relations = $this->referenceIndex->getRelations($table, $row);
 
-            foreach ($relations as $relation) {
-                if ($relation['type'] == 'db') {
-                    foreach ($relation['itemArray'] as $relatedRecord) {
-                        $uid = $relatedRecord['id'];
-                        $table = $relatedRecord['table'];
+                foreach ($relations as $relation) {
+                    if ($relation['type'] == 'db') {
+                        foreach ($relation['itemArray'] as $relatedRecord) {
+                            $uid = $relatedRecord['id'];
+                            $table = $relatedRecord['table'];
 
-                        if (
-                            in_array($table, $this->tablesToInclude)
-                            && !array_key_exists($table . ':' . $uid, $knownRecords)
-                        ) {
-                            $relatedRecord = [
-                                'table' => $table,
-                                'uid' => $uid
-                            ];
+                            if (
+                                in_array($table, $this->tablesToInclude)
+                                && !array_key_exists($table . ':' . $uid, $knownRecords)
+                            ) {
+                                $relatedRecord = [
+                                    'table' => $table,
+                                    'uid' => $uid
+                                ];
 
-                            $knownRecords[$table . ':' . $uid] = $relatedRecord;
-                            array_push($recordsToGetRelations, $relatedRecord);
-                            array_push($recordsToGetAcculumatedInformation, $relatedRecord);
+                                $knownRecords[$table . ':' . $uid] = $relatedRecord;
+                                array_push($recordsToGetRelations, $relatedRecord);
+                                array_push($recordsToGetAcculumatedInformation, $relatedRecord);
+                            }
                         }
                     }
                 }
             }
         }
+
         return $recordsToGetAcculumatedInformation;
     }
 }
