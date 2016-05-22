@@ -20,9 +20,9 @@ namespace Localizationteam\L10nmgr\Model;
  ***************************************************************/
 
 use Localizationteam\L10nmgr\Model\Tools\InlineRelationTool;
-use Localizationteam\L10nmgr\Model\Tools\RelationTool;
 use Localizationteam\L10nmgr\Model\Tools\Tools;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Database\ReferenceIndex;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -39,6 +39,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class L10nAccumulatedInformation
 {
+    protected $excludeIndex;
+    protected $tableUidContraintIndex;
     /**
      * @var array
      */
@@ -99,6 +101,13 @@ class L10nAccumulatedInformation
      */
     protected $t8Tools;
 
+
+
+    /**
+     * @var ReferenceIndex
+     */
+    protected $referenceIndex = NULL;
+
     /**
 	 * Constructor
 	 *
@@ -112,6 +121,8 @@ class L10nAccumulatedInformation
         // Load the extension's configuration
         $this->extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['l10nmgr']);
         $this->disallowDoktypes = GeneralUtility::trimExplode(',', $this->extensionConfiguration['disallowDoktypes']);
+
+        $this->referenceIndex = GeneralUtility::makeInstance(ReferenceIndex::class);
 
         $this->tree = $tree;
         $this->l10ncfg = $l10ncfg;
@@ -158,8 +169,8 @@ class L10nAccumulatedInformation
         $this->flexFormDiff = unserialize($l10ncfg['flexformdiff']);
         $this->flexFormDiff = $this->flexFormDiff[$this->sysLang];
 
-        $excludeIndex = array_flip(GeneralUtility::trimExplode(',', $l10ncfg['exclude'], 1));
-        $tableUidConstraintIndex = array_flip(GeneralUtility::trimExplode(',', $l10ncfg['tableUidConstraint'], 1));
+        $this->excludeIndex = array_flip(GeneralUtility::trimExplode(',', $l10ncfg['exclude'], 1));
+        $this->tableUidContraintIndex = array_flip(GeneralUtility::trimExplode(',', $l10ncfg['tableUidConstraint'], 1));
 
         // Init:
         $this->t8Tools = GeneralUtility::makeInstance(Tools::class);
@@ -183,10 +194,11 @@ class L10nAccumulatedInformation
         foreach ($tree->tree as $treeElement) {
 
             $pageId = $treeElement['row']['uid'];
-            if (!isset($excludeIndex['pages:' . $pageId]) && !in_array($treeElement['row']['doktype'],
-                    $this->disallowDoktypes)
+            if (
+                // check if page is allowed in export
+                !isset($this->excludeIndex['pages:' . $pageId])
+                && !in_array($treeElement['row']['doktype'], $this->disallowDoktypes)
             ) {
-
                 $this->_accumulatedInformation[$pageId]['header']['title'] = $treeElement['row']['title'];
                 $this->_accumulatedInformation[$pageId]['header']['icon'] = $treeElement['HTML'];
                 $this->_accumulatedInformation[$pageId]['header']['prevLang'] = $previewLanguage;
@@ -207,26 +219,7 @@ class L10nAccumulatedInformation
                             if (is_array($allRows) && count($allRows) > 0) {
                                 // Now, for each record, look for localization:
                                 foreach ($allRows as $row) {
-                                    $rowSignature = $table . ':' . $row['uid'];
-
-                                    $rowShallBeIncluded =
-                                        is_array($row)
-                                        && (
-                                            // if there is a table uid constraint, our row needs to be in it
-                                            ! is_array($tableUidConstraintIndex)
-                                            || count($tableUidConstraintIndex) == 0
-                                            || array_key_exists(
-                                                $rowSignature,
-                                                $tableUidConstraintIndex
-                                            )
-                                        )
-                                        && (
-                                            // row should not be explicetly excluded
-                                            ! isset($excludeIndex[$rowSignature])
-                                        )
-                                    ;
-
-                                    if($rowShallBeIncluded) {
+                                    if(! $this->rowIsExcluded($table, $row)) {
                                         BackendUtility::workspaceOL($table, $row);
                                         $this->addRow($pageId, $table, $row);
                                     }
@@ -247,29 +240,12 @@ class L10nAccumulatedInformation
             }
         }
 
-        $flattened = $this->flattenAccumulatedRecords();
 
-
-        /** @var RelationTool $relationTool */
-        $relationTool = GeneralUtility::makeInstance(RelationTool::class, $this->l10ncfg);
-        $relatedRecordsSignatures = $relationTool->getRelatedRecords($flattened, $this->l10ncfg);
-
-        foreach($relatedRecordsSignatures as $recordSignature) {
-            $uid = $recordSignature['uid'];
-            $table = $recordSignature['table'];
-
-            $row = BackendUtility::getRecord($table, $uid);
-            if(! is_null($row)) {
-                BackendUtility::workspaceOL($table, $row);
-
-                $pid = array_key_exists('pid', $row) ? $row['pid'] : 0;
-
-                $this->addRow($pid, $table, $row);
-            }
-        }
-
+        $this->addRelatedRecords();
 
         if($this->l10ncfg['nest_inline_records']) {
+            $flattened = $this->flattenAccumulatedRecords();
+
             /** @var InlineRelationTool $inlineRelationTool */
             $inlineRelationTool = GeneralUtility::makeInstance(InlineRelationTool::class, $this->l10ncfg);
             $inlineRelationTool->addNestingInformation($flattened);
@@ -343,6 +319,97 @@ class L10nAccumulatedInformation
 
             $this->_accumulatedInformation[$pageId]['items'][$table][$uid] = $translationDetails;
             $this->_increaseInternalCounters($translationDetails['fields']);
+        }
+    }
+
+    /**
+     * @param $table
+     * @param $row
+     * @return array
+     */
+    protected function rowIsExcluded($table, $row)
+    {
+        $rowSignature = $table . ':' . $row['uid'];
+
+        $rowShallBeIncluded =
+            is_array($row)
+            && (
+                // if there is a table uid constraint, our row needs to be in it
+                !is_array($this->tableUidContraintIndex)
+                || count($this->tableUidContraintIndex) == 0
+                || array_key_exists(
+                    $rowSignature,
+                    $this->tableUidContraintIndex
+                )
+            )
+            && (
+                // row should not be explicetly excluded
+                !isset($this->excludeIndex[$rowSignature])
+            )
+        ;
+
+        return ! $rowShallBeIncluded;
+    }
+
+
+    /**
+     * @return array
+     */
+    protected function addRelatedRecords()
+    {
+        $flattened = $this->flattenAccumulatedRecords();
+
+        $recordsToCheckRelations = [];
+        $alreadyKnown = [];
+        foreach ($flattened as $table => $records) {
+            foreach ($records as $uid => $record) {
+                $recordSignature = new RecordSignature($table, $uid);
+                $recordsToCheckRelations[] = $recordSignature;
+                $alreadyKnown[$recordSignature->toString()] = TRUE;
+            }
+        }
+
+        $allPagesInTree = [$this->l10ncfg['pid']];
+        foreach($this->tree->ids as $id) {
+            $allPagesInTree[] = $id;
+        }
+
+        /** @var RecordSignature $parentRecordSignature */
+        while ($parentRecordSignature = array_pop($recordsToCheckRelations)) {
+            $parentRow = BackendUtility::getRecordWSOL($parentRecordSignature->table, $parentRecordSignature->uid);
+            $relations = $this->referenceIndex->getRelations($parentRecordSignature->table, $parentRow);
+
+            foreach ($relations as $relation) {
+                if ($relation['type'] == 'db') {
+                    foreach ($relation['itemArray'] as $relatedRecord) {
+                        $table = $relatedRecord['table'];
+                        $uid = $relatedRecord['id'];
+                        $childRecordSignature = new RecordSignature($table, $uid);
+
+                        if(!(isset($alreadyKnown[$childRecordSignature->toString()]))) {
+
+                            $childRow = BackendUtility::getRecordWSOL($table, $uid);
+                            if (is_array($childRow)) {
+                                $positionInTree = array_key_exists('pid', $childRow) ? $childRow['pid'] : 0;
+
+                                $rowShallBeIncluded =
+                                    ! $this->rowIsExcluded($table, $childRow)
+                                    && (
+                                        $positionInTree == 0
+                                        || in_array($positionInTree, $allPagesInTree)
+                                    )
+                                ;
+
+                                if ($rowShallBeIncluded) {
+                                    $this->addRow($childRow['pid'], $table, $childRow);
+                                    $alreadyKnown[$childRecordSignature->toString()] = TRUE;
+                                    $recordsToCheckRelations[] = $childRecordSignature;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
