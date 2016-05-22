@@ -9,6 +9,7 @@ CREATE TABLE tx_l10nmgr_cfg (
 	cruser_id int(11) DEFAULT '0' NOT NULL,
 	title tinytext NOT NULL,
 	depth int(11) DEFAULT '0' NOT NULL,
+	exclude_pages tinytext NOT NULL,
 	displaymode int(11) DEFAULT '0' NOT NULL,
 	tablelist text NOT NULL,
 	exclude text NOT NULL,

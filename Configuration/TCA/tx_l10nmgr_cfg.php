@@ -53,6 +53,29 @@ return array(
                 'maxitems' => 1,
             )
         ),
+        'exclude_pages' => [
+            'exclude' => 1,
+            'label' => $l10n . ':tx_l10nmgr_cfg.exclude_pages',
+            'config' => [
+                'type' => 'group',
+                'internal_type' => 'db',
+
+                'allowed' => 'pages',
+                'minitems' => '0',
+                'maxitems' => '20',
+                'show_thumbs' => '1',
+                'size' => '5',
+
+                'wizards' => [
+                    'suggest' => [
+                        'type' => 'suggest',
+                        'default' => [
+                            'additionalSearchFields' => 'nav_title, alias, url',
+                        ],
+                    ],
+                ],
+            ],
+        ],
         'displaymode' => array(
             'exclude' => 1,
             'label' => $l10n . ':tx_l10nmgr_cfg.displaymode',
@@ -132,7 +155,7 @@ return array(
         ),
     ),
     'types' => array(
-        '0' => array('showitem' => 'title,filenameprefix;;;;2-2-2, depth;;;;3-3-3, sourceLangStaticId, tablelist, exclude, include, displaymode, nest_inline_records, incfcewithdefaultlanguage')
+        '0' => array('showitem' => 'title,filenameprefix;;;;2-2-2, depth;;;;3-3-3, exclude_pages, sourceLangStaticId, tablelist, exclude, include, displaymode, nest_inline_records, incfcewithdefaultlanguage')
     ),
     'palettes' => array(
         '1' => array('showitem' => '')

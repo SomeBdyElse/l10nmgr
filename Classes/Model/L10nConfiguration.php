@@ -110,10 +110,22 @@ class L10nConfiguration
         }
         $depth = $l10ncfg['depth'];
 
+
+        // conditions to build the page tree
+        $whereClause = 'AND ' . $GLOBALS['BE_USER']->getPagePermsClause(1);
+        if(
+            isset($l10ncfg['exclude_pages'])
+            && $l10ncfg['exclude_pages'] != ''
+            && $l10ncfg['exclude_pages'] != 0
+        ) {
+            $excludePageUids = $l10ncfg['exclude_pages'];
+            $whereClause .= ' AND uid NOT IN (' . $excludePageUids . ')';
+        }
+
         // Initialize tree object:
         /** @var $tree PageTreeView */
         $tree = GeneralUtility::makeInstance(PageTreeView::class);
-        $tree->init('AND ' . $GLOBALS['BE_USER']->getPagePermsClause(1));
+        $tree->init($whereClause);
         $tree->addField('l18n_cfg');
 
         $iconFactory = GeneralUtility::makeInstance(IconFactory::class);

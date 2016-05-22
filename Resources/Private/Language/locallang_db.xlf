@@ -54,6 +54,9 @@
 			<trans-unit id="tx_l10nmgr_cfg.tablelist.I.0" xml:space="preserve">
 				<source>11</source>
 			</trans-unit>
+			<trans-unit id="tx_l10nmgr_cfg.exclude_pages" xml:space="preserve" approved="yes">
+				<source>Exclude subpages</source>
+			</trans-unit>
 			<trans-unit id="tx_l10nmgr_cfg.tablelist.I.1" xml:space="preserve">
 				<source>22</source>
 			</trans-unit>

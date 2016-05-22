@@ -82,6 +82,9 @@
 				<source>Tables to export:</source>
 				<target>Zu exportierende Tabellen:</target>
 			</trans-unit>
+			<trans-unit id="tx_l10nmgr_cfg.exclude_pages" xml:space="preserve" approved="yes">
+				<target>Seitenteilbaum ausschließen</target>
+			</trans-unit>
 			<trans-unit id="tx_l10nmgr_cfg.exclude" xml:space="preserve" approved="yes">
 				<source>Exclude elements (comma list of &quot;table:uid&quot; pairs):</source>
 				<target>Auszuschließende Elemente (kommagetrennte Werte: &quot;Tabelle:uid,
