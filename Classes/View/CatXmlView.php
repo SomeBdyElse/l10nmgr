@@ -111,7 +111,7 @@ class CatXmlView extends AbstractExportView
                     }
                 }
             }
-            $output[] = "\t" . '</pageGrp>' . "\r";
+            $output[] = "\t" . '</pageGrp>' . "\n";
         }
 
         // Provide a hook for specific manipulations before building the actual XML
@@ -142,7 +142,7 @@ class CatXmlView extends AbstractExportView
         $XML .= "\t\t" . '<t3_workspaceId>' . $GLOBALS['BE_USER']->workspace . '</t3_workspaceId>' . "\n";
         $XML .= "\t\t" . '<t3_count>' . $accumObj->getFieldCount() . '</t3_count>' . "\n";
         $XML .= "\t\t" . '<t3_wordCount>' . $accumObj->getWordCount() . '</t3_wordCount>' . "\n";
-        $XML .= "\t\t" . '<t3_internal>' . "\r\t" . $this->renderInternalMessage() . "\t\t" . '</t3_internal>' . "\n";
+        $XML .= "\t\t" . '<t3_internal>' . "\n\t" . $this->renderInternalMessage() . "\t\t" . '</t3_internal>' . "\n";
         $XML .= "\t\t" . '<t3_formatVersion>' . L10NMGR_FILEVERSION . '</t3_formatVersion>' . "\n";
         $XML .= "\t\t" . '<t3_l10nmgrVersion>' . L10NMGR_VERSION . '</t3_l10nmgrVersion>' . "\n";
         $XML .= "\t" . '</head>' . "\n";
@@ -164,7 +164,7 @@ class CatXmlView extends AbstractExportView
             if (!empty($messages)) {
                 $messages .= "\n\t";
             }
-            $messages .= "\t\t" . '<t3_skippedItem>' . "\n\t\t\t\t" . '<t3_description>' . $messageInformation['message'] . '</t3_description>' . "\n\t\t\t\t" . '<t3_key>' . $messageInformation['key'] . '</t3_key>' . "\n\t\t\t" . '</t3_skippedItem>' . "\r";
+            $messages .= "\t\t" . '<t3_skippedItem>' . "\n\t\t\t\t" . '<t3_description>' . $messageInformation['message'] . '</t3_description>' . "\n\t\t\t\t" . '<t3_key>' . $messageInformation['key'] . '</t3_key>' . "\n\t\t\t" . '</t3_skippedItem>' . "\n";
         }
 
         return $messages;
