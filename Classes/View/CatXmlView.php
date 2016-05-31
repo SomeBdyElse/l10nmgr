@@ -292,8 +292,8 @@ class CatXmlView extends AbstractExportView
 
     private function processFieldContent($dataForTranslation, $table, $elementUid, $fieldName)
     {
-        if (is_array($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][self::class]['processFieldContent'])) {
-            foreach ($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][self::class]['processFieldContent'] as $classRef) {
+        if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr'][self::class]['processFieldContent'])) {
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr'][self::class]['processFieldContent'] as $classRef) {
                 $hookObj = GeneralUtility::getUserObj($classRef);
                 if (method_exists($hookObj, 'processFieldContent')) {
                     $dataForTranslation = $hookObj->processFieldContent($dataForTranslation, $table, $elementUid, $fieldName);
