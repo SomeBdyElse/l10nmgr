@@ -274,6 +274,8 @@ class CatXmlView extends AbstractExportView
                         'key' => $key,
                     ];
 
+                    $dataForTranslation = $this->processFieldContent($dataForTranslation, $table, $elementUid, $fieldName);
+
                     $fieldNode = $this->domDocument->createElement('data');
                     foreach ($attributes as $key => $value) {
                         $fieldNode->setAttribute($key, $value);
@@ -286,5 +288,19 @@ class CatXmlView extends AbstractExportView
         }
 
         return null;
+    }
+
+    private function processFieldContent($dataForTranslation, $table, $elementUid, $fieldName)
+    {
+        if (is_array($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][self::class]['processFieldContent'])) {
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][self::class]['processFieldContent'] as $classRef) {
+                $hookObj = GeneralUtility::getUserObj($classRef);
+                if (method_exists($hookObj, 'processFieldContent')) {
+                    $dataForTranslation = $hookObj->processFieldContent($dataForTranslation, $table, $elementUid, $fieldName);
+                }
+            }
+        }
+
+        return $dataForTranslation;
     }
 }
