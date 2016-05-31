@@ -186,8 +186,12 @@ class CatXmlParser
             $table = $dataNode->getAttribute('table');
             $elementUid = $dataNode->getAttribute('elementUid');
             $key = $dataNode->getAttribute('key');
+            list(, , $fieldName) = explode(':', $key);
 
-            $translationData[$table][$elementUid][$key] = $this->getTranslationFromDataNode($dataNode);
+            $dataFromTranslation = $this->getTranslationFromDataNode($dataNode);
+
+            $value = $this->processFieldContent($dataFromTranslation, $table, $elementUid, $fieldName);
+            $translationData[$table][$elementUid][$key] = $value;
         }
 
         /** @var TranslationData $translationDataObject */
@@ -224,5 +228,19 @@ class CatXmlParser
     public function getHeaderData()
     {
         return $this->headerData;
+    }
+
+    private function processFieldContent($dataFromTranslation, $table, $elementUid, $fieldName)
+    {
+        if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr'][self::class]['processFieldContent'])) {
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr'][self::class]['processFieldContent'] as $classRef) {
+                $hookObj = GeneralUtility::getUserObj($classRef);
+                if (method_exists($hookObj, 'processFieldContent')) {
+                    $dataFromTranslation = $hookObj->processFieldContent($dataFromTranslation, $table, $elementUid, $fieldName);
+                }
+            }
+        }
+
+        return $dataFromTranslation;
     }
 }
