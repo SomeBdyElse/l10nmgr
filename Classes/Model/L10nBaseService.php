@@ -18,6 +18,8 @@ namespace Localizationteam\L10nmgr\Model;
  *  GNU General Public License for more details.
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+use Localizationteam\L10nmgr\Model\Tools\InlineRelationTool;
+use Localizationteam\L10nmgr\Model\Tools\ParentRecordCreator;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
@@ -66,6 +68,17 @@ class L10nBaseService
      */
     public $lastTCEMAINCommandsCount = 0;
 
+    /**
+     * @var L10nConfiguration
+     */
+    protected $l10ncfgObj;
+
+    /**
+     * @var InlineRelationTool $inlineRelationTool
+     */
+    protected $inlineRelationTool = NULL;
+
+
     public function __construct()
     {
         // Load the extension's configuration
@@ -88,6 +101,8 @@ class L10nBaseService
      */
     function saveTranslation(L10nConfiguration $l10ncfgObj, TranslationData $translationObj)
     {
+        $this->l10ncfgObj = $l10ncfgObj;
+
         // Provide a hook for specific manipulations before saving
         if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['savePreProcess'])) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['savePreProcess'] as $classReference) {
@@ -98,6 +113,7 @@ class L10nBaseService
 
         $sysLang = $translationObj->getLanguage();
         $accumObj = $l10ncfgObj->getL10nAccumulatedInformationsObjectForLanguage($sysLang);
+
         $flexFormDiffArray = $this->_submitContentAndGetFlexFormDiff($accumObj->getInfoArray($sysLang),
             $translationObj->getTranslationData());
 
@@ -274,6 +290,9 @@ class L10nBaseService
     function _submitContentAsTranslatedLanguageAndGetFlexFormDiff($accum, $inputArray)
     {
         global $TCA;
+
+        $parentRecordCreatorsByTargetLanguage = [];
+
         if (is_array($inputArray)) {
             // Initialize:
             /** @var $flexToolObj FlexFormTools */
@@ -305,6 +324,21 @@ class L10nBaseService
 
                                     // If new element is required, we prepare for localization
                                     if ($Tuid === 'NEW') {
+                                        $defaultElementSignature = new RecordSignature($table, $elementUid);
+
+                                        if(! isset($parentRecordCreatorsByTargetLanguage[$Tlang])) {
+                                            $newParentRecordCreator = GeneralUtility::makeInstance(ParentRecordCreator::class,
+                                                $this->l10ncfgObj,
+                                                $this->TCEmain_cmd,
+                                                $Tlang
+                                            );
+                                            $parentRecordCreatorsByTargetLanguage[$Tlang] = $newParentRecordCreator;
+                                        }
+
+                                        /** @var ParentRecordCreator $parentRecordCreator */
+                                        $parentRecordCreator = $parentRecordCreatorsByTargetLanguage[$Tlang];
+                                        $parentRecordCreator->createParentRecordIfNecessary($defaultElementSignature);
+
                                         if ($table === 'tt_content' && ($gridElementsInstalled === true || $fluxInstalled === true)) {
                                             $element = BackendUtility::getRecordRaw($table,
                                                 'uid = ' . (int)$elementUid . ' AND deleted = 0');

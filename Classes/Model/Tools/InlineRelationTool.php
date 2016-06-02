@@ -5,17 +5,30 @@ namespace Localizationteam\L10nmgr\Model\Tools;
 
 
 use Localizationteam\L10nmgr\Model\InlineRelation;
+use Localizationteam\L10nmgr\Model\L10nConfiguration;
+use Localizationteam\L10nmgr\Model\RecordSignature;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Database\RelationHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class InlineRelationTool
 {
+    /**
+     * @var array
+     */
     protected $l10ncfg = NULL;
 
     protected $inlineRelations = NULL;
 
+    /**
+     * @var DatabaseConnection
+     */
+    protected $db = NULL;
+
     public function __construct($l10ncfg)
     {
+        $this->db = &$GLOBALS['TYPO3_DB'];
         $this->l10ncfg = $l10ncfg;
 
         $this->inlineRelations = $this->computeInlineRelations();
@@ -75,7 +88,7 @@ class InlineRelationTool
     /**
      * @return array
      */
-    protected function computeInlineRelations()
+    public function computeInlineRelations()
     {
         $tablesToConsider = GeneralUtility::trimExplode(',', $this->l10ncfg['tablelist'], true);
 
@@ -109,4 +122,37 @@ class InlineRelationTool
         return $inlineRelations;
     }
 
+    /**
+     * Checks if the given record is a child of another record. If it is
+     * this function returns the signature of the parent. False, if no
+     * relation or no parent can be found.
+     *
+     * @param RecordSignature $potentialChildSignature
+     * @return bool|RecordSignature record signature of the parents recor, or FALSE if there is no parent
+     */
+    public function checkIfRecordIsChildInInlineRelation(RecordSignature $potentialChildSignature)
+    {
+        /** @var InlineRelation $inlineRelation */
+        foreach($this->inlineRelations as $inlineRelation) {
+            if($inlineRelation->foreign_table == $potentialChildSignature->table) {
+                $parentRecord = $this->db->exec_SELECTgetSingleRow(
+                    'parentTable.uid',
+                    (
+                        $inlineRelation->parentTable . ' parentTable'
+                        . ' JOIN ' . $inlineRelation->foreign_table . ' childTable ON (childTable.' . $inlineRelation->foreign_field . ' = parentTable.uid)'
+                    ),
+                    (
+                        'childTable.uid = ' . $potentialChildSignature->uid
+                        . BackendUtility::deleteClause($inlineRelation->parentTable, 'parentTable')
+                    )
+                );
+
+                if(is_array($parentRecord)) {
+                    return new RecordSignature($inlineRelation->parentTable, $parentRecord['uid']);
+                }
+            }
+        }
+
+        return FALSE;
+    }
 }
