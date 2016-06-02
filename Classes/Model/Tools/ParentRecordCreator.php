@@ -62,14 +62,22 @@ class ParentRecordCreator
                 && ! $this->checkIfRecordIsTranlsatedInDatabase($parentRecordSignature)
             ) {
                 // create a new default translation of the parent record
-                $this->TCEmain_cmd[$parentRecordSignature->table][$parentRecordSignature->uid]['localize'] = $this->targetLanguageUid;
                 $this->elementsWithTranslations[$parentRecordSignature->toString()] = TRUE;
 
-                $this->createParentRecordIfNecessary($parentRecordSignature);
+                $grandParentRecords = $this->createParentRecordIfNecessary($parentRecordSignature);
+
+                array_push(
+                    $grandParentRecords,
+                    $parentRecordSignature
+                );
+
+                return $grandParentRecords;
             }
 
             $this->elementsWithTranslatedParent[$defaultRecordSignature->toString()] = TRUE;
         }
+
+        return [];
     }
 
     private function checkIfRecordIsTranlsatedInDatabase($recordSignature)

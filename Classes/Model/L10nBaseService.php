@@ -337,7 +337,11 @@ class L10nBaseService
 
                                         /** @var ParentRecordCreator $parentRecordCreator */
                                         $parentRecordCreator = $parentRecordCreatorsByTargetLanguage[$Tlang];
-                                        $parentRecordCreator->createParentRecordIfNecessary($defaultElementSignature);
+                                        $recordsToCreate = $parentRecordCreator->createParentRecordIfNecessary($defaultElementSignature);
+
+                                        foreach($recordsToCreate as $parentRecordSignature) {
+                                            $this->TCEmain_cmd[$parentRecordSignature->table][$parentRecordSignature->uid]['localize'] = $Tlang;
+                                        }
 
                                         if ($table === 'tt_content' && ($gridElementsInstalled === true || $fluxInstalled === true)) {
                                             $element = BackendUtility::getRecordRaw($table,
