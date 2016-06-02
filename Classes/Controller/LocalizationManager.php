@@ -392,9 +392,6 @@ class LocalizationManager extends BaseScriptClass
 
         /** @var $service L10nBaseService */
         $service = GeneralUtility::makeInstance(L10nBaseService::class);
-        if (GeneralUtility::_POST('import_asdefaultlanguage') == '1') {
-            $service->setImportAsDefaultLanguage(true);
-        }
         // Buttons:
         $_selectOptions = array('0' => '-default-');
         $_selectOptions = $_selectOptions + $this->MOD_MENU["lang"];
@@ -402,9 +399,6 @@ class LocalizationManager extends BaseScriptClass
                     '<div class="form-group"><div class="checkbox"><label>' .
                         '<input type="checkbox" value="1" checked="checked" name="check_exports" /> ' . $GLOBALS['LANG']->getLL('export.xml.check_exports.title') . '<br />' .
                     '</label></div></div><br />' .
-                    '<div class="form-group"><div class="checkbox"><label>' .
-                        '<input type="checkbox" value="1" name="import_asdefaultlanguage" /> ' . $GLOBALS['LANG']->getLL('import.xml.asdefaultlanguage.title') .
-                    '</label></div></div><br /><br />' .
                 '</div><div class="form-section"><div class="form-group">
                     <label>' . $GLOBALS['LANG']->getLL('export.xml.source-language.title') . '</label><br />' .
                     $this->_getSelectField("export_xml_forcepreviewlanguage", '0', $_selectOptions) .
@@ -560,9 +554,6 @@ class LocalizationManager extends BaseScriptClass
             //print "<pre>";
             //var_dump($GLOBALS['BE_USER']->user);
             //print "</pre>";
-            if (GeneralUtility::_POST('import_asdefaultlanguage') == '1') {
-                $service->setImportAsDefaultLanguage(true);
-            }
             if (GeneralUtility::_POST('import_oldformat') == '1') {
                 //Support for the old Format of XML Import (without pageGrp element)
                 $actionInfo .= $GLOBALS['LANG']->getLL('import.xml.old-format.message');
@@ -709,10 +700,8 @@ class LocalizationManager extends BaseScriptClass
             '</label></div></div><br />' .
             '<div class="form-group"><div class="checkbox"><label>' .
                 '<input type="checkbox" value="1" name="import_delL10N" /> ' . $GLOBALS['LANG']->getLL('import.xml.delL10N.title') .
-            '</label></div></div><br />' .
-            '<div class="form-group"><div class="checkbox"><label>' .
-                '<input type="checkbox" value="1" name="import_asdefaultlanguage" /> ' . $GLOBALS['LANG']->getLL('import.xml.asdefaultlanguage.title') .
-            '</label></div></div><br /><br /></div>' .
+            '</label></div></div><br /><br />' .
+            '</div>' .
             '<div class="form-section">' .
                 '<input type="file" size="60" name="uploaded_import_file" /><br />' .
             '</div>' .

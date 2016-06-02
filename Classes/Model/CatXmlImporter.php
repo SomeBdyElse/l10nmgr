@@ -113,7 +113,6 @@ class CatXmlImporter
 
         /** @var L10nBaseService $service */
         $service = GeneralUtility::makeInstance(L10nBaseService::class);
-        $service->setImportAsDefaultLanguage($this->asDefaultLanguage);
 
         $service->saveTranslation($this->l10nConfiguration, $translationData);
         $this->logActionInfo($GLOBALS['LANG']->getLL('import.xml.done.message') . '(Command count:' . $service->lastTCEMAINCommandsCount . ')');

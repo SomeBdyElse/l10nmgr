@@ -114,11 +114,6 @@ class Import extends CommandLineController
             "Path to the file to import. Can be XML or ZIP archive. If both XML string and import file are not defined, will import from FTP server (if defined).\n"
         );
         $this->cli_options[] = array('--server', 'Server link', "Server link for the preview URL.\n");
-        $this->cli_options[] = array(
-            '--importAsDefaultLanguage',
-            'Import as default language',
-            "If set this setting will overwrite the default language during the import.\nThe values can be: \n TRUE = Content will be imported as default language.\n FALSE = Content will be imported as translation (default).\n"
-        );
 
         // Setting help texts
         $this->cli_help['name'] = 'Localization Manager importer';
@@ -261,14 +256,6 @@ class Import extends CommandLineController
             $server = (string)$this->cli_args['_DEFAULT'][5];
         }
         $this->callParameters['server'] = $server;
-        // Import as default language
-        $importAsDefaultLanguage = false;
-        if (isset($this->cli_args['--importAsDefaultLanguage'])) {
-            $importAsDefaultLanguage = (bool)$this->cli_args['--importAsDefaultLanguage'][0];
-        } elseif (isset($this->cli_args['_DEFAULT'][6])) {
-            $importAsDefaultLanguage = (bool)$this->cli_args['_DEFAULT'][6];
-        }
-        $this->callParameters['importAsDefaultLanguage'] = $importAsDefaultLanguage;
     }
 
     /**
@@ -303,9 +290,6 @@ class Import extends CommandLineController
 
         /** @var $service L10nBaseService */
         $service = GeneralUtility::makeInstance(L10nBaseService::class);
-        if ($this->callParameters['importAsDefaultLanguage']) {
-            $service->setImportAsDefaultLanguage(true);
-        }
         /** @var $factory TranslationDataFactory */
         $factory = GeneralUtility::makeInstance(TranslationDataFactory::class);
 
@@ -432,9 +416,6 @@ class Import extends CommandLineController
 
                     /** @var $service L10nBaseService */
                     $service = GeneralUtility::makeInstance(L10nBaseService::class);
-                    if ($this->callParameters['importAsDefaultLanguage']) {
-                        $service->setImportAsDefaultLanguage(true);
-                    }
                     /** @var $factory TranslationDataFactory */
                     $factory = GeneralUtility::makeInstance(TranslationDataFactory::class);
 
