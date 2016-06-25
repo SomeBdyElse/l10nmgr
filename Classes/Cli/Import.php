@@ -24,6 +24,7 @@ if (!defined('TYPO3_cliMode')) {
     die('You cannot run this script directly!');
 }
 
+use Localizationteam\L10nmgr\Model\CatXmlImporter;
 use Localizationteam\L10nmgr\Model\CatXmlImportManager;
 use Localizationteam\L10nmgr\Model\L10nBaseService;
 use Localizationteam\L10nmgr\Model\L10nConfiguration;
@@ -87,9 +88,8 @@ class Import extends CommandLineController
     /**
      * Constructor
      */
-    function Import()
+    public function __construct()
     {
-
         // Running parent class constructor
         parent::__construct();
 
@@ -407,84 +407,23 @@ class Import extends CommandLineController
 
         if (count($xmlFilesArr) > 0) {
             foreach ($xmlFilesArr as $xmlFile) {
-                try {
-                    $xmlFileHead = $this->getXMLFileHead($xmlFile);
-                    // Set workspace to the required workspace ID from CATXML:
-                    $GLOBALS['BE_USER']->setWorkspace($xmlFileHead['t3_workspaceId'][0]['XMLvalue']);
-                    // Set import language to t3_sysLang from XML
-                    $this->sysLanguage = $xmlFileHead['t3_sysLang'][0]['XMLvalue'];
+                // Relevant processing of XML Import with the help of the Importmanager
+                /** @var CatXmlImporter $importManager */
+                $importManager = GeneralUtility::makeInstance(
+                    CatXmlImporter::class,
+                    FALSE, // asDefaultLanguage
+                    FALSE, // delete existing translation
+                    $this->callParameters['preview'] // generate preview link
+                );
 
-                    /** @var $service L10nBaseService */
-                    $service = GeneralUtility::makeInstance(L10nBaseService::class);
-                    /** @var $factory TranslationDataFactory */
-                    $factory = GeneralUtility::makeInstance(TranslationDataFactory::class);
+                $importManager->importFromFile($xmlFile);
 
-                    // Relevant processing of XML Import with the help of the Importmanager
-                    /** @var $importManager CatXmlImportManager */
-                    $importManager = GeneralUtility::makeInstance(CatXmlImportManager::class, $xmlFile,
-                        $this->sysLanguage, '');
-                    if ($importManager->parseAndCheckXMLFile() === false) {
-                        $out .= "\n\n" . $importManager->getErrorMessages();
-                    } else {
-                        // Find l10n configuration record
-                        /** @var $l10ncfgObj L10nConfiguration */
-                        $l10ncfgObj = GeneralUtility::makeInstance(L10nConfiguration::class);
-                        $l10ncfgObj->load($importManager->headerData['t3_l10ncfg']);
-                        $status = $l10ncfgObj->isLoaded();
-                        if ($status === false) {
-                            $this->cli_echo("l10ncfg not loaded! Exiting...\n");
-                            exit;
-                        }
-                        // Delete previous translations
-                        $importManager->delL10N($importManager->getDelL10NDataFromCATXMLNodes($importManager->xmlNodes));
-
-                        // Make preview links
-                        if ($this->callParameters['preview']) {
-                            $pageIds = array();
-                            if (empty($importManager->headerData['t3_previewId'])) {
-                                $pageIds = $importManager->getPidsFromCATXMLNodes($importManager->xmlNodes);
-                            } else {
-                                $pageIds[0] = $importManager->headerData['t3_previewId'];
-                            }
-                            /** @var $mkPreviewLinks MkPreviewLinkService */
-                            $mkPreviewLinks = GeneralUtility::makeInstance(MkPreviewLinkService::class,
-                                $importManager->headerData['t3_workspaceId'], $importManager->headerData['t3_sysLang'],
-                                $pageIds);
-                            $previewLink = $mkPreviewLinks->mkSinglePreviewLink($importManager->headerData['t3_baseURL'],
-                                $this->callParameters['server']);
-                            $out .= $previewLink;
-                        }
-
-                        /** @var $translationData TranslationData */
-                        $translationData = $factory->getTranslationDataFromCATXMLNodes($importManager->getXMLNodes());
-                        $translationData->setLanguage($this->sysLanguage);
-                        unset($importManager);
-                        $service->saveTranslation($l10ncfgObj, $translationData);
-
-                        // Store some information about the imported file
-                        // This is used later for reporting by mail
-                        $this->filesImported[$xmlFile] = array(
-                            'workspace' => $xmlFileHead['t3_workspaceId'][0]['XMLvalue'],
-                            'language' => $xmlFileHead['t3_targetLang'][0]['XMLvalue'],
-                            'configuration' => $xmlFileHead['t3_l10ncfg'][0]['XMLvalue']
-                        );
-                    }
-                } catch (Exception $e) {
-                    if ($e->getCode() == 1390394945) {
-                        $errorMessage = $e->getMessage();
-                    } else {
-                        $errorMessage = 'Badly formatted file (' . $e->getMessage() . ')';
-                    }
-                    $out .= "\n\n" . $xmlFile . ': ' . $errorMessage;
-                    // Store the error message for later reporting by mail
-                    $this->filesImported[$xmlFile] = array(
-                        'error' => $errorMessage
-                    );
-                }
+                $out .= $importManager->getActionInfoAsString();
             }
         } else {
             $out .= "\n\nNo files to import! Either point to a file using the --file option or define a FTP server to get the files from";
         }
+
         // Clean up after import
         $this->importCleanUp();
 
